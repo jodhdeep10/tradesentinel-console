@@ -1,0 +1,198 @@
+<title>TradeSentinel Console</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:wght@600&display=swap">
+<style>
+/* Layout: an operations console. Queue on the left, the decision trail on the right, one reading order: what the AI thinks, what the rules changed, what the human must do. */
+:root{--bg:#f3f5f9;--panel:#fff;--ink:#16213a;--muted:#5a6680;--line:#d8deea;--navy:#1f3864;--navy-ink:#fff;--maroon:#8b1e3f;--soft:#e9eef7;
+--s1:#b3123a;--s2:#c2540a;--s3:#8a6d00;--s4:#46617f;--ok:#17744a;--warn-bg:#fff4dc;--warn-ink:#7a5200;
+--sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",Consolas,monospace;--serif:"Source Serif 4",Georgia,serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1524;--panel:#182136;--ink:#e6ebf5;--muted:#9aa7c0;--line:#2c3854;--navy:#8fb0ea;--navy-ink:#0f1524;--maroon:#ee8aa8;--soft:#222d47;--s1:#ff6b8d;--s2:#ff9f5a;--s3:#e6c74a;--s4:#9ab7d6;--ok:#55c996;--warn-bg:#3a2e12;--warn-ink:#f2d27c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1524;--panel:#182136;--ink:#e6ebf5;--muted:#9aa7c0;--line:#2c3854;--navy:#8fb0ea;--navy-ink:#0f1524;--maroon:#ee8aa8;--soft:#222d47;--s1:#ff6b8d;--s2:#ff9f5a;--s3:#e6c74a;--s4:#9ab7d6;--ok:#55c996;--warn-bg:#3a2e12;--warn-ink:#f2d27c;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--sans);padding-block:0 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:14px 0 12px;border-bottom:2px solid var(--navy)}
+.brand{font:600 20px var(--serif);color:var(--navy)}.brand small{display:block;font:12px var(--sans);color:var(--muted)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:6px 12px;font:500 14px var(--sans);color:var(--muted);cursor:pointer}
+nav button[aria-selected=true]{color:var(--navy);border-color:var(--maroon)}
+.spacer{flex:1}
+.toggle{display:flex;gap:8px;align-items:center;font-size:13px}
+.banner{background:var(--warn-bg);color:var(--warn-ink);padding:6px 12px;font-size:13px;margin:10px 0;border-radius:3px}
+.grid{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;min-width:0}
+h2{font:600 15px var(--serif);color:var(--navy);margin:0 0 8px;text-wrap:balance}
+h3{font:600 13px var(--sans);color:var(--maroon);margin:0 0 6px;letter-spacing:.02em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.queue button.tk{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 6px;cursor:pointer;color:inherit;font:inherit}
+.queue button.tk:hover{background:var(--soft)}.queue button.tk[aria-current=true]{background:var(--soft);box-shadow:inset 3px 0 0 var(--maroon)}
+.tk .txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.tk .meta{font-size:12px;color:var(--muted)}
+.sev{align-self:start;justify-self:start;display:inline-block;font:500 12px var(--mono);padding:1px 6px;border:1.5px solid currentColor;border-radius:3px;text-align:center}
+.S1{color:var(--s1)}.S2{color:var(--s2)}.S3{color:var(--s3)}.S4{color:var(--s4)}
+.chip{display:inline-block;font-size:12px;padding:1px 7px;border-radius:10px;background:var(--soft);color:var(--ink)}
+.chip.m{background:none;border:1px solid var(--maroon);color:var(--maroon)}
+.bar{height:8px;background:var(--soft);border-radius:4px;overflow:hidden;width:160px;max-width:100%}.bar i{display:block;height:100%;background:var(--navy)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.trail{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.trail li{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;align-items:start}
+.trail b{font-weight:600}.muted{color:var(--muted)}.small{font-size:12.5px}
+button.act{font:500 13px var(--sans);padding:6px 12px;border-radius:3px;border:1px solid var(--navy);background:var(--navy);color:var(--navy-ink);cursor:pointer}
+button.alt{background:none;color:var(--navy)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--maroon);outline-offset:1px}
+select,input[type=text],input[type=time],textarea{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:5px 7px;max-width:100%}
+textarea{width:100%;min-height:70px}
+.hyp{border:1px solid var(--line);border-radius:3px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}.hyp.sel{border-color:var(--ok);box-shadow:inset 3px 0 0 var(--ok)}
+.ev{font:12px var(--mono);color:var(--muted)}
+.draft{font:13px/1.5 var(--mono);background:var(--soft);padding:10px;border-radius:3px;overflow-wrap:anywhere}
+mark{background:var(--warn-bg);color:var(--warn-ink);padding:0 2px}
+.never{display:flex;flex-wrap:wrap;gap:6px}.never span{font-size:12px;border:1px dashed var(--muted);color:var(--muted);padding:2px 7px;border-radius:3px;text-decoration:line-through}
+.log{font:12px/1.5 var(--mono);max-height:180px;overflow:auto;margin:0;padding:0;list-style:none}
+.senior{background:var(--warn-bg);color:var(--warn-ink);padding:6px 10px;border-radius:3px;font-size:13px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}th{background:var(--navy);color:var(--navy-ink);text-align:left;padding:6px 8px;font-weight:500}td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.tile{border:1px solid var(--line);border-radius:3px;padding:8px 10px}.tile b{display:block;font:600 22px var(--serif);color:var(--navy)}
+.pass{color:var(--ok);font-weight:600}.fail{color:var(--s1);font-weight:600}.part{color:var(--s2);font-weight:600}
+pre{font:12px/1.5 var(--mono);overflow:auto;background:var(--soft);padding:10px;border-radius:3px;margin:0}
+ol.rb{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}ol.rb label{display:flex;gap:8px;align-items:flex-start}
+</style>
+<header class="top">
+  <div class="brand">TradeSentinel<small>Support triage console. Synthetic data, order-entry and execution flow, one client tier, one venue.</small></div>
+  <nav role="tablist" id="nav"></nav><div class="spacer"></div>
+  <label class="toggle"><input type="checkbox" id="mh" checked> Market hours</label>
+</header>
+<div class="banner">Prototype. All tickets, clients, incidents and releases are invented. Nothing connects to a live system, and the local classifier stands in for the pilot's API language model.</div>
+<main id="view"></main>
+<script>__ENGINE__</script>
+<script>
+const RAW=__DATA__, E=TradeSentinelEngine, D=E.parseData(RAW), HOLD=__EVAL__;
+const cfg=__CONFIG__, runbooks=__RUNBOOKS__, PAPER=__PAPER__;
+const eng=E.create({config:cfg,train:D.train,incidents:D.incidents,deployments:D.deployments,runbooks,temperature:HOLD.temperature});
+const LEVEL={L0:'Shadow',L1:'Suggest',L2:'Assisted',L3:'Limited auto'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pc=x=>Math.round(x*100)+'%';
+const S={tab:'queue',sel:'T-1001',tickets:D.demo.map(t=>({...t,st:{opened:null,routed:false,owner:null,override:null,merge:false,cause:null,steps:{},fix:false,next:'',approved:false,sent:false,closed:false}})),audit:[],n:1013};
+function log(m){const d=new Date().toTimeString().slice(0,8);S.audit.unshift(d+'  '+m)}
+function recompute(){
+  const mh=document.getElementById('mh').checked;
+  S.tickets.forEach(t=>{t.marketHours=mh;t.triage=eng.triage(t)});
+  const g=eng.cluster(S.tickets);
+  g.forEach((gr,i)=>gr.members.forEach(m=>{const t=S.tickets[m];const b=eng.applyBlastRadius(t.triage.severity,gr.members.length,t.marketHours);
+    t.group=i;t.reports=gr.members.length;t.peers=gr.members.map(x=>S.tickets[x].id);t.sev=b.severity;t.fullTrail=t.triage.trail.concat(b.steps)}));
+}
+const cur=()=>S.tickets.find(t=>t.id===S.sel);
+function nav(){document.getElementById('nav').innerHTML=[['queue','Triage queue'],['control','Control layer'],['evidence','Evaluation evidence']].map(([k,l])=>`<button role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${l}</button>`).join('')}
+function queue(){
+  const order=[...S.tickets].sort((a,b)=>E.RANK[b.sev]-E.RANK[a.sev]||a.minute-b.minute);
+  return `<section class="panel queue"><h2>Queue, highest priority first</h2>${order.map(t=>`<button class="tk" data-t="${t.id}" aria-current="${t.id===S.sel}"><span class="sev ${t.sev}">${t.sev}</span><span><span class="txt">${esc(t.text)}</span><span class="meta">${t.id} · ${esc(t.client)} · ${t.time}${t.reports>1?` · <span class="chip m">${t.reports} linked</span>`:''}${t.triage.lowConfidence?' · <span class="chip">unsure</span>':''}${t.st.closed?' · closed':''}</span></span></button>`).join('')}
+  <h3 style="margin-top:12px">Add a report</h3><label class="small muted" for="newt">Type any client message to see it triaged live</label><textarea id="newt" placeholder="e.g. my sell order went through but nothing shows at the exchange"></textarea><div class="row" style="margin-top:6px"><button class="act alt" id="add">Triage this report</button></div></section>`;
+}
+function triageCard(t){
+  const r=t.triage,c=cfg.categories[r.category],lvl=c.level;
+  return `<section class="panel"><div class="row" style="justify-content:space-between"><h2>${t.id}: ${esc(t.client)} via ${t.channel}, ${t.time}</h2><span class="sev ${t.sev}" style="font-size:15px">${t.sev}</span></div><p style="margin:0 0 10px">“${esc(t.text)}”</p>
+  ${r.senior||t.sev==='S1'?`<div class="senior"><b>Senior engineer required:</b> ${esc((r.seniorReasons.concat(t.sev==='S1'?['critical priority']:[])).join('; '))}.</div>`:''}
+  ${lvl==='L0'?'<p class="muted">Shadow mode: suggestions for this category are recorded but hidden. The engineer triages unaided.</p>':`<div class="cols" style="margin-top:10px"><div><h3>What the AI read</h3><div class="row"><b>${esc(c.label)}</b><span class="muted">${pc(r.confidence)}</span></div><div class="bar" role="img" aria-label="Confidence ${pc(r.confidence)}"><i style="width:${pc(r.confidence)}"></i></div>
+  <p class="small muted" style="margin:6px 0 0">Also possible: ${r.alternatives.map(a=>esc(cfg.categories[a.label].label)+' '+pc(a.p)).join(', ')}</p>
+  ${r.lowConfidence?'<p class="small" style="margin:6px 0 0"><b>Below the confidence threshold.</b> The strictest floor of any plausible category applies, and a senior engineer reviews.</p>':''}</div>
+  <div><h3>How severity was set (it can only go up)</h3><ol class="trail">${t.fullTrail.map(s=>`<li><span class="sev ${s.sev}">${s.sev}</span><span><b>${s.step}.</b> ${esc(s.why)}</span></li>`).join('')}</ol></div></div>`}
+  ${t.reports>1?`<p style="margin:10px 0 0" class="small"><b>Suggested incident:</b> ${t.peers.join(', ')} look like one fault. ${t.st.merge?'<span class="pass">Merged by engineer.</span>':'<button class="act alt" id="merge">Confirm merge</button> <span class="muted">Nothing merges without a person.</span>'}</p>`:''}
+  </section>`;
+}
+function decision(t){
+  const r=t.triage,c=cfg.categories[r.category],lvl=c.level,st=t.st,owners=[...new Set(Object.values(cfg.categories).map(x=>x.owner).concat([cfg.security_rule.route]))];
+  const pre=lvl==='L2';
+  return `<section class="panel"><div class="row" style="justify-content:space-between"><h2>Your decision</h2><span class="chip m">${lvl} ${LEVEL[lvl]}</span></div>
+  ${c.held_reason?`<p class="small muted" style="margin:0 0 8px">${esc(c.held_reason)}</p>`:''}
+  ${st.routed?`<p><span class="pass">Routed to ${esc(st.owner)}</span>${st.override?` <span class="muted">(override: ${esc(st.override)})</span>`:''}</p>`:`
+  <div class="row"><label for="owner">Owner</label><select id="owner">${pre?'':'<option value="">Choose an owner</option>'}${owners.map(o=>`<option ${pre&&o===r.owner?'selected':''}>${esc(o)}</option>`).join('')}</select>
+  ${lvl!=='L0'&&!pre?`<span class="small muted">AI suggests: ${esc(r.owner)}</span>`:''}</div>
+  <div class="row" style="margin-top:8px"><label for="sev">Priority</label><select id="sev">${['S1','S2','S3','S4'].map(s=>`<option ${s===t.sev?'selected':''}>${s}</option>`).join('')}</select><span class="small muted">Only a person can lower priority, and it needs a reason.</span></div>
+  <div class="row" style="margin-top:8px"><label for="why">Reason (needed if you change anything)</label><input type="text" id="why" style="flex:1;min-width:180px"></div>
+  <p id="err" class="small fail" style="margin:6px 0 0" hidden></p>
+  <div class="row" style="margin-top:8px"><button class="act" id="route">${pre?'Approve pre-filled routing':'Confirm my routing'}</button></div>`}
+  <h3 style="margin-top:12px">Never allowed at any level</h3><div class="never"><span>Auto-downgrade</span><span>Auto-close</span><span>Auto-merge</span><span>Deploy or roll back in production</span><span>Send an unapproved update</span><span>State an uncited cause</span></div></section>`;
+}
+function resolution(t){
+  const r=t.triage,st=t.st;
+  if(!st.routed) return `<section class="panel"><h2>Resolution assistant</h2><p class="muted">Opens once routing is decided. Past incidents, ranked causes, runbook and the client update appear here.</p></section>`;
+  const hs=eng.hypotheses(t.text,r.category,t.minute),conf=st.cause!==null?hs[st.cause]:null;
+  const dr=eng.draftUpdate({reports:t.reports,severity:t.sev,category:r.category,confirmed:conf,startedAt:t.time,approved:st.approved});
+  const text=st.next?dr.text.replace(/\[NEXT UPDATE TIME:[^\]]*\]/,'Next update by '+esc(st.next)+'.'):dr.text;
+  const holes=(text.match(/\[[A-Z ]+:[^\]]*\]/g)||[]).length;
+  return `<section class="panel stack"><h2>Resolution assistant</h2>
+  <div><h3>Likely causes, with the evidence for each</h3><div class="stack" style="gap:8px">${hs.map((h,i)=>`<div class="hyp ${st.cause===i?'sel':''}"><div class="row" style="justify-content:space-between"><b>${esc(h.summary)}</b><span class="muted small">${pc(h.weight)} of evidence weight</span></div>${h.evidence.map(e=>`<span class="ev">${e.type} ${e.id}: ${esc(e.text)}</span>`).join('')}<div><button class="act alt" data-cause="${i}">${st.cause===i?'Selected as cause':'Confirm as cause'}</button></div></div>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Evidence weight is a ranking aid and is not a probability.</p></div>
+  <div class="cols"><div><h3>Runbook</h3><ol class="rb">${runbooks[r.category].map((s,i)=>`<li><label><input type="checkbox" data-step="${i}" ${st.steps[i]?'checked':''}> <span>${esc(s)}</span></label></li>`).join('')}</ol></div>
+  <div><h3>Recommended fix</h3>${conf?`<p style="margin:0 0 6px">${esc(conf.fix)}</p>${st.fix?'<span class="pass">Approved. The engineer runs it through the change process.</span>':'<button class="act alt" id="fix">Approve fix for engineer to run</button>'}`:'<p class="muted" style="margin:0">Confirm a cause first.</p>'}</div></div>
+  <div><h3>Client update draft</h3><div class="draft">${esc(text).replace(/\[[A-Z ]+:[^\]]*\]/g,m=>`<mark>${m}</mark>`)}</div>
+  <div class="row" style="margin-top:8px"><label for="next">Next update time</label><input type="time" id="next" value="${esc(st.next)}">
+  ${st.sent?'<span class="pass">Marked as sent (simulated).</span>':`<button class="act" id="send" ${holes?'disabled':''}>Approve and send</button>${holes?`<span class="small muted">${holes} blank${holes>1?'s':''} left. The system will not fill these by guessing.</span>`:''}`}</div></div>
+  <div><h3>Closure note</h3><div class="draft">${esc(eng.closureNote({category:r.category,confirmed:conf,severity:t.sev,reports:t.reports}))}</div><div class="row" style="margin-top:8px">${st.closed?'<span class="pass">Closed by the engineer.</span>':`<button class="act alt" id="close" ${conf&&st.sent?'':'disabled'}>Close issue (human action)</button>`}</div></div></section>`;
+}
+function queueView(){
+  const t=cur(); if(!t.st.opened) t.st.opened=Date.now();
+  const routed=S.tickets.filter(x=>x.st.routed),ov=routed.filter(x=>x.st.override).length;
+  return `<div class="grid">${queue()}<div class="stack" style="min-width:0">${triageCard(t)}${decision(t)}${resolution(t)}
+  <section class="panel"><h2>Audit trail</h2><div class="small muted" style="margin-bottom:6px">Decisions this session: ${routed.length}. Overrides: ${ov}. Review time is logged so approvals do not become rubber stamps.</div><ul class="log">${S.audit.length?S.audit.map(a=>`<li>${esc(a)}</li>`).join(''):'<li>No decisions yet.</li>'}</ul></section></div></div>`;
+}
+function controlView(){
+  const rows=Object.entries(cfg.categories).map(([k,c])=>`<tr><td><b>${esc(c.label)}</b></td><td>${esc(c.owner)}</td><td><span class="sev ${c.floor_market}">${c.floor_market}</span> / <span class="sev ${c.floor_off}">${c.floor_off}</span></td><td><select data-level="${k}" aria-label="Level for ${esc(c.label)}" ${c.held_reason?'disabled':''}>${['L0','L1','L2'].map(l=>`<option value="${l}" ${c.level===l?'selected':''}>${l} ${LEVEL[l]}</option>`).join('')}<option disabled>L3 Limited auto (not earned)</option></select>${c.held_reason?'<div class="small muted">Held at L1 until Gate 3 evidence exists.</div>':''}</td></tr>`).join('');
+  return `<div class="stack"><section class="panel"><h2>Automation is a setting, one category at a time</h2><p class="muted" style="margin-top:0">Change a level, then go back to the queue: the same ticket now behaves differently, with no code change. L3 stays locked because no category has earned it.</p><div class="tw"><table><thead><tr><th>Category</th><th>Owning team</th><th>Floor: market / off hours</th><th>Automation level</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="row" style="margin-top:12px"><label for="thr">Confidence threshold for senior review</label><input id="thr" type="range" min="0.3" max="0.9" step="0.05" value="${cfg.confidence_threshold}"><b id="thrv">${pc(cfg.confidence_threshold)}</b></div></section>
+  <section class="panel"><h2>Reuse test: market data feed delay alerts (paper only)</h2><p style="margin-top:0">This harder category is specified as configuration and is not run. Machine alerts skip the classifier; the floors, ladder, approval gates and audit trail carry over unchanged.</p><p><b>What the paper test found:</b> clustering must become a per-category strategy, because alerts group by feed and venue while client reports group by text. Blast radius needs entitled-client counts as well as report counts. These are small engine changes, so the design passes with two named conditions.</p><pre>${esc(JSON.stringify(PAPER,null,2))}</pre></section></div>`;
+}
+function evidenceView(){
+  const R=HOLD,tr=R.severity.table;
+  return `<div class="stack"><section class="panel"><h2>Held-out test: ${R.n} hand-written synthetic reports, run once on frozen settings</h2><div class="tiles">
+  <div class="tile"><b>${R.category.accuracy}%</b>Category accuracy (keyword rules: ${R.category.baselineAccuracy}%)</div>
+  <div class="tile"><b>${tr[0].criticalRecall}%</b>Critical issues escalated (model alone: ${tr[1].criticalRecall}%)</div>
+  <div class="tile"><b>${R.severity.underS1S2.length}</b>Critical issues under-triaged in strict terms</div>
+  <div class="tile"><b>${R.rootCause.top3}%</b>True cause in top 3 (target 70%)</div>
+  <div class="tile"><b>${R.calibration.ece}</b>Calibration error (lower is better)</div></div></section>
+  <section class="panel"><h2>The control layer is what earns the money</h2><div class="tw"><table><thead><tr><th>Approach</th><th>Critical escalated</th><th>Minor over-escalated</th><th>Net USD per issue at 1% / 5% / 10% critical</th></tr></thead><tbody>${tr.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.criticalRecall}%</td><td>${x.falseEscalationRate}%</td><td>${[.01,.05,.1].map(p=>x.netPayoffPerIssue[p]).join(' / ')}</td></tr>`).join('')}</tbody></table></div><p class="small muted">Payoffs are the proposal's assumed values, and critical shares are assumptions.</p></section>
+  <section class="panel"><h2>Where it failed</h2><div class="tw"><table><thead><tr><th>Report</th><th>Truth</th><th>System</th></tr></thead><tbody>${R.severity.underS1S2.map(u=>`<tr><td>${esc(u.text)}</td><td><span class="sev ${u.truth}">${u.truth}</span></td><td><span class="sev ${u.got}">${u.got}</span></td></tr>`).join('')}</tbody></table></div>
+  <p>Understated language is the dangerous case. Gate 1 is therefore <span class="part">partly met</span>: time to triage cannot be measured without real users, and “near zero” under-triage was missed.</p><p class="small muted">Limits: one author wrote the data and the tests, so these results are likely optimistic, and they say nothing about real tickets.</p></section></div>`;
+}
+function render(){nav();const v=document.getElementById('view');v.innerHTML=S.tab==='queue'?queueView():S.tab==='control'?controlView():evidenceView()}
+function refresh(){recompute();render()}
+function routeNow(t,owner,sev,why){
+  const before=t.sev,changed=owner!==t.triage.owner||sev!==before;
+  const secs=t.st.opened?Math.round((Date.now()-t.st.opened)/1000):0;
+  t.st.routed=true;t.st.owner=owner;t.st.override=changed?why:null;
+  if(sev!==before){t.triage.trail=t.triage.trail;t.humanSev=sev}
+  log(`${t.id} routed to ${owner}, priority ${sev}${changed?' (OVERRIDE: '+why+')':''}, review ${secs}s, level ${t.triage.level}`);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const t=cur();
+  if(b.dataset.tab){S.tab=b.dataset.tab;render();return}
+  if(b.dataset.t){S.sel=b.dataset.t;render();return}
+  if(b.id==='merge'){t.peers.forEach(id=>{S.tickets.find(x=>x.id===id).st.merge=true});log(`${t.peers.join(', ')} merged by engineer`);render();return}
+  if(b.id==='route'){
+    const owner=document.getElementById('owner').value,sev=document.getElementById('sev').value,why=document.getElementById('why').value.trim(),err=document.getElementById('err');
+    const changed=owner!==t.triage.owner||sev!==t.sev;
+    if(!owner){err.hidden=false;err.textContent='Choose an owner first.';return}
+    if(changed&&!why&&t.triage.level!=='L0'){err.hidden=false;err.textContent='Add a reason, so the override can be learned from.';return}
+    routeNow(t,owner,sev,why);if(sev!==t.sev){t.sev=sev}render();return}
+  if(b.dataset.cause!==undefined){t.st.cause=+b.dataset.cause;log(`${t.id} cause confirmed by engineer`);render();return}
+  if(b.id==='fix'){t.st.fix=true;log(`${t.id} fix approved; engineer runs it through change process`);render();return}
+  if(b.id==='send'){t.st.approved=true;t.st.sent=true;log(`${t.id} client update approved and sent (simulated)`);render();return}
+  if(b.id==='close'){t.st.closed=true;log(`${t.id} closed by engineer`);render();return}
+  if(b.id==='add'){const v=document.getElementById('newt').value.trim();if(!v)return;const last=S.tickets.reduce((a,x)=>Math.max(a,x.minute),0)+1;const id='T-'+S.n++;
+    S.tickets.push({id,text:v,client:'Your test report',channel:'Console',time:'now',minute:last,st:{opened:null,routed:false,owner:null,override:null,merge:false,cause:null,steps:{},fix:false,next:'',approved:false,sent:false,closed:false}});S.sel=id;refresh();return}
+});
+document.addEventListener('change',e=>{
+  const el=e.target,t=cur();
+  if(el.id==='mh'){refresh();return}
+  if(el.dataset.level){cfg.categories[el.dataset.level].level=el.value;log(`Level for ${cfg.categories[el.dataset.level].label} set to ${el.value}`);refresh();return}
+  if(el.dataset.step!==undefined){t.st.steps[el.dataset.step]=el.checked;return}
+  if(el.id==='next'){t.st.next=el.value;render();return}
+});
+document.addEventListener('input',e=>{if(e.target.id==='thr'){cfg.confidence_threshold=+e.target.value;document.getElementById('thrv').textContent=pc(cfg.confidence_threshold);recompute()}});
+// Named views: #queue, #control, #evidence, or a ticket such as #T-1005. #walk-T-1001 replays a finished case for the screenshots.
+function fromHash(){
+  const h=location.hash.slice(1);
+  if(h==='control'||h==='evidence'||h==='queue'){S.tab=h}
+  else if(/^T-\d+$/.test(h)&&S.tickets.some(x=>x.id===h)){S.sel=h}
+  else if(h.startsWith('walk-')){const id=h.slice(5),t=S.tickets.find(x=>x.id===id);if(t){S.sel=id;routeNow(t,t.triage.owner,t.sev,'');t.st.cause=0;t.st.fix=true;t.st.next='10:30';t.st.approved=true;t.st.sent=true;log(`${id} cause confirmed, fix approved, update approved (replayed)`)}}
+}
+recompute();fromHash();render();addEventListener('hashchange',()=>{fromHash();render()});
+</script>

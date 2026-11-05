@@ -1,0 +1,16 @@
+{
+  "_status": "PAPER SPECIFICATION ONLY. Not run in the prototype. Tests whether a harder category fits the same workflow.",
+  "category_id": "market_data_feed_delay",
+  "label": "Market data feed delay",
+  "owner": "Market Data Engineering",
+  "level": "L0",
+  "floor_market": "S2",
+  "floor_off": "S3",
+  "always_senior": false,
+  "input": { "type": "machine_alert", "required_fields": ["feed_id","venue","lag_ms","first_seen"], "classifier_needed": false },
+  "cluster": { "strategy": "key_window", "key": ["feed_id","venue"], "window_minutes": 15 },
+  "blast_radius": [ { "min_clients_entitled": 20, "floor": "S1", "market_hours_only": true } ],
+  "severity_inputs": { "lag_ms_floor": [ { "min_lag_ms": 1000, "floor": "S3" }, { "min_lag_ms": 5000, "floor": "S2" } ] },
+  "runbook": ["Confirm lag at the feed handler","Compare primary and secondary feeds","Request approval to fail over","Tell entitled clients once the cause is cited"],
+  "client_update": { "audience": "all_entitled_clients", "approval": "senior_engineer" }
+}

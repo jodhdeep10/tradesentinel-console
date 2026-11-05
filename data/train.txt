@@ -1,0 +1,108 @@
+order_rejected|S3|My limit order was rejected as soon as I sent it, reject reason says price outside band
+order_rejected|S3|Getting a reject on every order in this symbol, message says invalid tick size
+order_rejected|S3|Order refused by the system with error lot size not valid
+order_rejected|S3|Why was my buy order rejected? It says exceeds pre-trade risk limit but my limit should be higher
+order_rejected|S2|All our desk orders are being rejected by risk check since this morning, we cannot enter anything
+order_rejected|S3|Order rejected, code 2051 instrument not found, symbol was traded fine yesterday
+order_rejected|S4|One order got rejected because I typed wrong quantity, what does reject code 1033 mean
+order_rejected|S3|Rejection message margin insufficient but the account has been funded
+order_rejected|S3|Portal shows order status rejected with no reason text
+order_rejected|S2|Every new order from our algo is bouncing with a credit limit reject during the open
+order_rejected|S3|Stop loss order rejected at entry, trigger price not accepted
+order_rejected|S3|Venue is rejecting my orders for this new listing, says symbol halted but it is not
+order_rejected|S4|Order was declined once then went through on retry, want to know why it declined
+order_rejected|S3|Basket upload failed validation, half the lines rejected for invalid instrument code
+order_rejected|S2|Risk gateway rejecting all clients orders after the limit file load
+order_rejected|S3|My order fails at entry with price band error even though price is inside the band
+order_rejected|S3|Cannot place orders in this contract, rejected as restricted instrument
+order_rejected|S3|Modify request was rejected, replace not allowed, original order still live
+order_stuck|S2|My orders are stuck in pending and I cannot cancel them, market is moving
+order_stuck|S2|Order has been sitting in open pending status for ten minutes with no acknowledgement
+order_stuck|S1|All orders across our desk are hanging with no ack from the exchange during market hours
+order_stuck|S3|Cancel request sent but order still shows working after several minutes
+order_stuck|S2|No confirmation on my order, screen just spins, status not updating
+order_stuck|S2|Order not moving from new to acknowledged, been waiting a long time
+order_stuck|S3|Screen shows order pending, not sure if it reached the market
+order_stuck|S1|Queue is backed up, nobody can get orders out, everything pending since the open
+order_stuck|S3|Order status frozen in my blotter, needs refresh to update
+order_stuck|S2|Sent a replace and it never came back, order stuck in pending replace
+order_stuck|S2|Orders are very slow to acknowledge today, taking over a minute each
+order_stuck|S3|My order after market close still shows pending from today
+order_stuck|S2|Cannot cancel working order, cancel just times out, worried about being filled
+order_stuck|S2|Orders hang when I submit, no ack no reject nothing
+order_stuck|S3|Good till cancelled order stuck in queued state since last evening
+order_stuck|S1|Everyone on our floor reports orders stuck, cannot exit positions in a fast market
+order_stuck|S3|Blotter stuck on order sent state for one order
+order_stuck|S2|Order acknowledgement delayed and the status is stale across my orders
+execution_failed|S1|Many clients report orders went to market but executions failed and positions are wrong
+execution_failed|S2|My order was accepted but failed to execute, venue shows no trade
+execution_failed|S2|Execution failed with internal error after order was routed
+execution_failed|S2|Market order did not fill even though there was plenty of liquidity
+execution_failed|S2|Partial fill then the remainder vanished, no cancel message
+execution_failed|S1|Smart router sending orders nowhere, executions failing across all accounts during the open
+execution_failed|S2|IOC order expired unfilled when the book clearly had size at my price
+execution_failed|S2|Order routed but execution report says failed, client lost the trade
+execution_failed|S1|Fatal execution error on all outgoing orders, clients are losing money right now
+execution_failed|S3|After hours order failed to execute, can be reviewed tomorrow
+execution_failed|S2|My sell did not execute and now the price has dropped, trade should have gone through
+execution_failed|S2|Trade busted without notice, execution reversed on my account
+execution_failed|S2|Algo slice failed to execute and parent order is stuck half complete
+execution_failed|S2|Exit order failed during the sell off, I am exposed
+execution_failed|S1|Exchange link failing executions for every client, large losses reported
+execution_failed|S3|Order failed to fill in pre-market session, low urgency
+execution_failed|S2|Remaining quantity dropped silently after a partial execution
+execution_failed|S2|Order was routed to the wrong venue segment and did not execute
+fill_mismatch|S3|My fill quantity on the portal does not match the contract note
+fill_mismatch|S3|Executed price shown is different from what the venue confirms
+fill_mismatch|S3|Position is off by 200 shares compared to my trades today
+fill_mismatch|S2|Our positions are wrong after the morning fills, risk numbers do not tie out
+fill_mismatch|S3|Trade appears twice in my trade book, duplicate fill showing
+fill_mismatch|S3|Fill reported on venue but missing from my blotter
+fill_mismatch|S4|Small rounding difference in average price on yesterday's trade
+fill_mismatch|S3|Allocation to sub accounts is wrong, block fill split incorrectly
+fill_mismatch|S2|Drop copy does not match our fills, several hundred trades unreconciled
+fill_mismatch|S3|End of day reconciliation break on three trades
+fill_mismatch|S3|Average price on the blotter differs from the broker confirm
+fill_mismatch|S3|My holdings did not update after the trade was filled
+fill_mismatch|S2|Positions showing double after fills, cannot trust our exposure
+fill_mismatch|S4|Contract note has a different commission from what I expected
+fill_mismatch|S3|Allocated quantity missing from one fund after block trade
+fill_mismatch|S3|Trade history is missing two fills I can see in the exchange report
+fill_mismatch|S3|P and L wrong because a fill was booked at wrong price
+fill_mismatch|S2|Reconciliation breaks across all accounts since today's release
+session_connectivity|S2|Our FIX session keeps disconnecting every few minutes
+session_connectivity|S1|FIX gateway is down, we have lost connectivity to the venue during market hours
+session_connectivity|S2|Sequence number mismatch on logon, session will not establish
+session_connectivity|S2|Cannot log on to the order gateway, heartbeat timeout
+session_connectivity|S2|API connection dropping with socket reset
+session_connectivity|S3|Test FIX session not connecting in UAT
+session_connectivity|S2|Certificate error when connecting to the gateway, TLS handshake failed
+session_connectivity|S1|All client sessions dropped at the same time, nobody is connected
+session_connectivity|S2|High latency on the line to the venue, heartbeats being missed
+session_connectivity|S3|Session reset needed after weekend, logon rejected out of sequence
+session_connectivity|S2|Trading API returning connection refused since a few minutes
+session_connectivity|S2|Websocket for order updates keeps dropping
+session_connectivity|S3|Disconnects in the evening after market hours, no live orders
+session_connectivity|S1|Primary and backup lines both down, we are disconnected from the market
+session_connectivity|S2|Network path to gateway flapping, resend requests piling up
+session_connectivity|S3|Need FIX sequence reset before tomorrow open
+session_connectivity|S2|Terminal shows disconnected from server and will not reconnect
+session_connectivity|S2|Client gateway TLS certificate expired and session refused
+access_howto|S4|How do I add a new user to my trading account
+access_howto|S4|Forgot my password for the trading portal, need a reset
+access_howto|S4|Where can I download my contract notes
+access_howto|S3|I cannot see the derivatives segment in my terminal, need permission enabled
+access_howto|S4|How do I set up a bracket order on the platform
+access_howto|S4|Please explain what the order type good till date means
+access_howto|S3|New trader cannot log in, account locked after attempts
+access_howto|S4|Can you share the user guide for the new terminal version
+access_howto|S4|How do I change my default order quantity setting
+access_howto|S3|Entitlement missing for market depth screen after role change
+access_howto|S4|Need a report of last month trades, where is it
+access_howto|S4|What are the hours for the pre open session
+access_howto|S3|My account is not enabled to trade this segment, who can activate it
+access_howto|S4|Request to reset two factor device for a user
+access_howto|S4|How to export my blotter to excel
+access_howto|S3|Permission denied when opening the order entry screen, role issue
+access_howto|S4|Question on how margin is displayed on the dashboard
+access_howto|S4|Please add my colleague to the alerts mailing list

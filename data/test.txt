@@ -1,0 +1,90 @@
+D01|dev|order_rejected|S3|1|-|40|risk_limit_config|Rejects saying I am over my limit, but I traded far more than this yesterday.
+D02|dev|order_rejected|S3|1|-|65|venue_rule_change|Tick size error on every price I try in this stock since this morning.
+D03|dev|order_stuck|S2|1|C_D1|100|oms_queue_backlog|Orders pending for a while now, no ack.
+D04|dev|order_stuck|S2|1|C_D1|104|oms_queue_backlog|my orders are stuck, nothing is coming back from the exchange
+D05|dev|order_stuck|S2|1|C_D1|109|oms_queue_backlog|Pending orders piling up on our side, cannot cancel any of them
+D06|dev|execution_failed|S2|1|-|130|router_fault|Order accepted then failed, there is no trade on the exchange.
+D07|dev|execution_failed|S2|1|-|190|venue_partial_outage|Part filled, then the balance disappeared without any cancel.
+D08|dev|execution_failed|S3|0|-|400|router_fault|Pre-open order did not execute. No hurry, please check.
+D09|dev|fill_mismatch|S3|1|-|220|dropcopy_gap|One fill on the exchange report is not on my blotter.
+D10|dev|fill_mismatch|S3|0|-|430|allocation_rule_error|Block trade split to funds looks wrong, one fund short.
+D11|dev|session_connectivity|S2|1|-|60|fix_seq_gap|Logon refused, sequence too low. Session down.
+D12|dev|session_connectivity|S2|1|-|150|cert_expiry|TLS failure on connecting to gateway since 10am.
+D13|dev|session_connectivity|S3|0|-|420|network_path|UAT connection is flapping tonight.
+D14|dev|access_howto|S4|0|-|440|user_error_training|Where do I see my order history?
+D15|dev|access_howto|S3|1|-|30|entitlement_missing|New dealer cannot see order entry, says not authorised.
+D16|dev|access_howto|S4|1|-|80|user_error_training|What does GTD order validity mean?
+D17|dev|order_rejected|S2|1|C_D2|240|risk_limit_config|Risk check is rejecting everything from our desk.
+D18|dev|order_rejected|S2|1|C_D2|246|risk_limit_config|All orders bounced by the risk gateway after 1pm.
+D19|dev|order_stuck|S3|0|-|410|venue_ack_timeout|Order from today still displays pending after close.
+D20|dev|fill_mismatch|S2|1|-|260|dropcopy_gap|Drop copy totals are way off from our internal fills.
+H01|holdout|order_rejected|S3|1|-|15|venue_rule_change|Tried to buy at the open and got told price is outside the allowed band, but it isn't.
+H02|holdout|order_rejected|S3|1|-|35|symbol_master_stale|Instrument unknown when I enter this recently listed company.
+H03|holdout|order_rejected|S3|1|-|55|risk_limit_config|Bounced for exceeding exposure limit; our risk team raised it last week.
+H04|holdout|order_rejected|S4|0|-|405|user_error_training|Got a rejection after typing a lot size of 7. What's the right lot?
+H05|holdout|order_rejected|S2|1|C1|120|risk_limit_config|Everything our algos send is being refused on credit limit.
+H06|holdout|order_rejected|S2|1|C1|123|risk_limit_config|Credit limit reject on all our flow for the last few minutes!
+H07|holdout|order_rejected|S2|1|C1|127|risk_limit_config|We are unable to trade, each ticket is turned down with limit breach
+H08|holdout|order_rejected|S2|1|C1|131|risk_limit_config|Limit breach errors across the desk, started just after 11
+H09|holdout|order_rejected|S3|1|-|145|symbol_master_stale|Security is marked suspended on your side but it's trading normally at the exchange.
+H10|holdout|order_rejected|S3|1|-|205|venue_rule_change|Replace denied by venue: not allowed to amend. Why?
+H11|holdout|order_rejected|S3|0|-|415|symbol_master_stale|Basket file for tomorrow fails on 12 ISINs.
+H12|holdout|order_rejected|S3|1|-|300|risk_limit_config|Margin shortfall reject, though we wired funds in this morning and they show credited.
+H13|holdout|order_stuck|S2|1|-|20|venue_ack_timeout|Sent a sell 8 minutes ago. Not filled, not rejected, nothing.
+H14|holdout|order_stuck|S1|1|C2|50|oms_queue_backlog|Nobody here can get anything out, whole floor sees pending, the market is falling fast
+H15|holdout|order_stuck|S1|1|C2|52|oms_queue_backlog|pending on all orders!! we can't exit positions
+H16|holdout|order_stuck|S1|1|C2|54|oms_queue_backlog|Status not changing for any of our orders. Urgent, volatile market.
+H17|holdout|order_stuck|S1|1|C2|55|oms_queue_backlog|Order screen hanging, all tickets waiting on ack
+H18|holdout|order_stuck|S1|1|C2|58|oms_queue_backlog|Same problem as others: no acknowledgement on any order since 9:50
+H19|holdout|order_stuck|S1|1|C2|61|oms_queue_backlog|Can't cancel, can't send. Everything sits in queue.
+H20|holdout|order_stuck|S2|1|-|160|venue_ack_timeout|Cancel has been timing out for 5 mins, I'm afraid it will fill.
+H21|holdout|order_stuck|S2|1|-|210|venue_ack_timeout|Acks taking 90 seconds today. Normally instant.
+H22|holdout|order_stuck|S3|0|-|425|oms_queue_backlog|A GTC from last night is still showing queued this evening.
+H23|holdout|order_stuck|S3|1|-|275|oms_queue_backlog|Just one order looks frozen in my blotter. Refresh hasn't helped.
+H24|holdout|order_stuck|S2|1|-|285|venue_ack_timeout|Amend went in and nothing returned. Stuck awaiting replace confirmation.
+H25|holdout|execution_failed|S1|1|C3|70|router_fault|Router is failing, clients across accounts report no executions and rising losses
+H26|holdout|execution_failed|S1|1|C3|72|router_fault|Multiple accounts: orders go out and come back failed. Big money at stake.
+H27|holdout|execution_failed|S1|1|C3|74|router_fault|Execution failures everywhere this morning, please escalate
+H28|holdout|execution_failed|S1|1|C3|78|router_fault|All our sell orders failed to execute in the sell-off
+H29|holdout|execution_failed|S2|1|-|95|venue_partial_outage|Quick question, nothing major - my IOC partly filled and the rest disappeared?
+H30|holdout|execution_failed|S2|1|-|110|router_fault|Small thing maybe: market order did not trade although the book had depth.
+H31|holdout|execution_failed|S2|1|-|140|router_fault|Client missed the trade because internal error came back after routing.
+H32|holdout|execution_failed|S2|1|-|170|venue_partial_outage|Trade reversed on my account, no one told me why.
+H33|holdout|execution_failed|S2|1|-|180|router_fault|Child order of my algo never traded and the parent is half done.
+H34|holdout|execution_failed|S3|0|-|402|router_fault|Pre-market order didn't go through. Can look tomorrow.
+H35|holdout|execution_failed|S2|1|-|225|venue_partial_outage|Exit did not execute while the stock was dropping. Now holding a loss.
+H36|holdout|execution_failed|S2|1|-|255|router_fault|Sent to wrong segment by the router I think, it never traded.
+H37|holdout|execution_failed|S2|1|-|310|venue_partial_outage|Remainder cancelled by itself after a fill, no message.
+H38|holdout|fill_mismatch|S3|1|-|25|dropcopy_gap|Portal says 500 filled, confirm from venue says 450.
+H39|holdout|fill_mismatch|S3|1|-|85|dropcopy_gap|I see the same trade listed two times.
+H40|holdout|fill_mismatch|S2|1|C4|235|dropcopy_gap|Since today's release positions do not tie to the exchange for most accounts.
+H41|holdout|fill_mismatch|S2|1|C4|238|dropcopy_gap|Recon breaks all over, our exposure numbers are unreliable.
+H42|holdout|fill_mismatch|S2|1|C4|243|dropcopy_gap|Positions look doubled after this morning's trades.
+H43|holdout|fill_mismatch|S3|0|-|435|allocation_rule_error|Sub-account allocation off on today's block.
+H44|holdout|fill_mismatch|S4|0|-|445|user_error_training|Average price differs by a paisa on yesterday's trade.
+H45|holdout|fill_mismatch|S3|1|-|265|dropcopy_gap|Holdings didn't change after my buy executed.
+H46|holdout|fill_mismatch|S3|1|-|320|allocation_rule_error|Fund B never got its share of the block.
+H47|holdout|fill_mismatch|S4|0|-|450|user_error_training|Brokerage on the contract note looks higher than expected.
+H48|holdout|session_connectivity|S1|1|C5|12|network_path|We've lost the venue. Both lines dead.
+H49|holdout|session_connectivity|S1|1|C5|14|network_path|All sessions dropped at 9:15 for our firm, can't reconnect.
+H50|holdout|session_connectivity|S1|1|C5|16|network_path|Gateway unreachable, market is open and we are blind.
+H51|holdout|session_connectivity|S2|1|-|90|fix_seq_gap|Resend storm on our FIX line, keeps resetting.
+H52|holdout|session_connectivity|S2|1|-|115|cert_expiry|Handshake fails since midnight, I suspect the cert.
+H53|holdout|session_connectivity|S2|1|-|195|network_path|Latency spike, missing heartbeats, session dropped twice.
+H54|holdout|session_connectivity|S3|0|-|412|fix_seq_gap|Please reset our sequence numbers before Monday.
+H55|holdout|session_connectivity|S2|1|-|280|network_path|Terminal keeps saying offline. Restarted twice.
+H56|holdout|session_connectivity|S3|0|-|455|network_path|API socket closes at night, no live trading then.
+H57|holdout|session_connectivity|S2|1|-|330|fix_seq_gap|Order update stream keeps cutting out on the websocket.
+H58|holdout|access_howto|S4|1|-|22|user_error_training|How do I place a cover order?
+H59|holdout|access_howto|S4|1|-|42|user_error_training|Where's the guide for version 9 of the terminal?
+H60|holdout|access_howto|S3|1|-|75|entitlement_missing|Segment for currency futures isn't visible since my role changed.
+H61|holdout|access_howto|S4|0|-|408|user_error_training|Can I get my last quarter trade report?
+H62|holdout|access_howto|S3|1|-|135|entitlement_missing|User locked out after failed attempts, dealer needs access today.
+H63|holdout|access_howto|S4|0|-|418|user_error_training|What time does pre-open start?
+H64|holdout|access_howto|S4|1|-|250|user_error_training|How can I change default quantity?
+H65|holdout|access_howto|S4|0|-|428|entitlement_missing|Add a new colleague to the portal please.
+H66|holdout|access_howto|S2|1|-|290|entitlement_missing|Someone logged in to my account from an unknown location and I did not authorise it.
+H67|holdout|access_howto|S2|1|-|315|entitlement_missing|Suspicious login alert on our admin user; possible credential compromise.
+H68|holdout|execution_failed|S2|1|-|340|venue_partial_outage|Not urgent, but my limit order that should have traded at the touch shows nothing done.
+H69|holdout|order_stuck|S2|1|-|345|venue_ack_timeout|Hello team, hope you are well. Just wondering about an order I sent a while ago, no update on it so far.
+H70|holdout|order_rejected|S3|1|-|350|venue_rule_change|Getting error 2047 when I enter.

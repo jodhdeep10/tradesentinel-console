@@ -1,0 +1,745 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0"><title>TradeSentinel Console</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:wght@600&display=swap">
+<style>
+/* Layout: an operations console. Queue on the left, the decision trail on the right, one reading order: what the AI thinks, what the rules changed, what the human must do. */
+:root{--bg:#f3f5f9;--panel:#fff;--ink:#16213a;--muted:#5a6680;--line:#d8deea;--navy:#1f3864;--navy-ink:#fff;--maroon:#8b1e3f;--soft:#e9eef7;
+--s1:#b3123a;--s2:#c2540a;--s3:#8a6d00;--s4:#46617f;--ok:#17744a;--warn-bg:#fff4dc;--warn-ink:#7a5200;
+--sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;--mono:"IBM Plex Mono",Consolas,monospace;--serif:"Source Serif 4",Georgia,serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1524;--panel:#182136;--ink:#e6ebf5;--muted:#9aa7c0;--line:#2c3854;--navy:#8fb0ea;--navy-ink:#0f1524;--maroon:#ee8aa8;--soft:#222d47;--s1:#ff6b8d;--s2:#ff9f5a;--s3:#e6c74a;--s4:#9ab7d6;--ok:#55c996;--warn-bg:#3a2e12;--warn-ink:#f2d27c;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1524;--panel:#182136;--ink:#e6ebf5;--muted:#9aa7c0;--line:#2c3854;--navy:#8fb0ea;--navy-ink:#0f1524;--maroon:#ee8aa8;--soft:#222d47;--s1:#ff6b8d;--s2:#ff9f5a;--s3:#e6c74a;--s4:#9ab7d6;--ok:#55c996;--warn-bg:#3a2e12;--warn-ink:#f2d27c;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--sans);padding-block:0 32px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:14px 0 12px;border-bottom:2px solid var(--navy)}
+.brand{font:600 20px var(--serif);color:var(--navy)}.brand small{display:block;font:12px var(--sans);color:var(--muted)}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:6px 12px;font:500 14px var(--sans);color:var(--muted);cursor:pointer}
+nav button[aria-selected=true]{color:var(--navy);border-color:var(--maroon)}
+.spacer{flex:1}
+.toggle{display:flex;gap:8px;align-items:center;font-size:13px}
+.banner{background:var(--warn-bg);color:var(--warn-ink);padding:6px 12px;font-size:13px;margin:10px 0;border-radius:3px}
+.grid{display:grid;grid-template-columns:minmax(280px,360px) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:14px;min-width:0}
+h2{font:600 15px var(--serif);color:var(--navy);margin:0 0 8px;text-wrap:balance}
+h3{font:600 13px var(--sans);color:var(--maroon);margin:0 0 6px;letter-spacing:.02em}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.queue button.tk{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:9px 6px;cursor:pointer;color:inherit;font:inherit}
+.queue button.tk:hover{background:var(--soft)}.queue button.tk[aria-current=true]{background:var(--soft);box-shadow:inset 3px 0 0 var(--maroon)}
+.tk .txt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.tk .meta{font-size:12px;color:var(--muted)}
+.sev{align-self:start;justify-self:start;display:inline-block;font:500 12px var(--mono);padding:1px 6px;border:1.5px solid currentColor;border-radius:3px;text-align:center}
+.S1{color:var(--s1)}.S2{color:var(--s2)}.S3{color:var(--s3)}.S4{color:var(--s4)}
+.chip{display:inline-block;font-size:12px;padding:1px 7px;border-radius:10px;background:var(--soft);color:var(--ink)}
+.chip.m{background:none;border:1px solid var(--maroon);color:var(--maroon)}
+.bar{height:8px;background:var(--soft);border-radius:4px;overflow:hidden;width:160px;max-width:100%}.bar i{display:block;height:100%;background:var(--navy)}
+.stack{display:flex;flex-direction:column;gap:14px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.trail{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.trail li{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px;align-items:start}
+.trail b{font-weight:600}.muted{color:var(--muted)}.small{font-size:12.5px}
+button.act{font:500 13px var(--sans);padding:6px 12px;border-radius:3px;border:1px solid var(--navy);background:var(--navy);color:var(--navy-ink);cursor:pointer}
+button.alt{background:none;color:var(--navy)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--maroon);outline-offset:1px}
+select,input[type=text],input[type=time],textarea{font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:5px 7px;max-width:100%}
+textarea{width:100%;min-height:70px}
+.hyp{border:1px solid var(--line);border-radius:3px;padding:8px 10px;display:flex;flex-direction:column;gap:5px}.hyp.sel{border-color:var(--ok);box-shadow:inset 3px 0 0 var(--ok)}
+.ev{font:12px var(--mono);color:var(--muted)}
+.draft{font:13px/1.5 var(--mono);background:var(--soft);padding:10px;border-radius:3px;overflow-wrap:anywhere}
+mark{background:var(--warn-bg);color:var(--warn-ink);padding:0 2px}
+.never{display:flex;flex-wrap:wrap;gap:6px}.never span{font-size:12px;border:1px dashed var(--muted);color:var(--muted);padding:2px 7px;border-radius:3px;text-decoration:line-through}
+.log{font:12px/1.5 var(--mono);max-height:180px;overflow:auto;margin:0;padding:0;list-style:none}
+.senior{background:var(--warn-bg);color:var(--warn-ink);padding:6px 10px;border-radius:3px;font-size:13px}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}th{background:var(--navy);color:var(--navy-ink);text-align:left;padding:6px 8px;font-weight:500}td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.tile{border:1px solid var(--line);border-radius:3px;padding:8px 10px}.tile b{display:block;font:600 22px var(--serif);color:var(--navy)}
+.pass{color:var(--ok);font-weight:600}.fail{color:var(--s1);font-weight:600}.part{color:var(--s2);font-weight:600}
+pre{font:12px/1.5 var(--mono);overflow:auto;background:var(--soft);padding:10px;border-radius:3px;margin:0}
+ol.rb{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}ol.rb label{display:flex;gap:8px;align-items:flex-start}
+</style>
+<header class="top">
+  <div class="brand">TradeSentinel<small>Support triage console. Synthetic data, order-entry and execution flow, one client tier, one venue.</small></div>
+  <nav role="tablist" id="nav"></nav><div class="spacer"></div>
+  <label class="toggle"><input type="checkbox" id="mh" checked> Market hours</label>
+</header>
+<div class="banner">Prototype. All tickets, clients, incidents and releases are invented. Nothing connects to a live system, and the local classifier stands in for the pilot's API language model.</div>
+<main id="view"></main>
+<script>// TradeSentinel decision engine. Runs unchanged in the browser demo and in the evaluation harness.
+// The classifiers stand in for the pilot's API language model; the control layer is the real design.
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.TradeSentinelEngine = factory();
+})(typeof self !== 'undefined' ? self : this, function () {
+  const STOP = new Set('a an the and or but if to of in on at for from by with is are was were be been it this that i my me we our you your they them he she have has had do does did not no as so just please can could would will there here am pm what why how when where who which than then too very some any all'.split(' ').filter(w => !['not', 'no', 'all', 'how', 'where', 'what', 'why', 'any'].includes(w)));
+  const RANK = { S4: 0, S3: 1, S2: 2, S1: 3 };
+  const SEV = ['S4', 'S3', 'S2', 'S1'];
+  const higher = (a, b) => (RANK[a] >= RANK[b] ? a : b);
+
+  function stem(w) {
+    if (w.length > 5 && w.endsWith('ing')) return w.slice(0, -3);
+    if (w.length > 4 && w.endsWith('ed')) return w.slice(0, -2);
+    if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) return w.slice(0, -1);
+    return w;
+  }
+  function tokens(text) {
+    const words = text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w && !STOP.has(w)).map(stem);
+    const out = words.slice();
+    for (let i = 0; i < words.length - 1; i++) out.push(words[i] + '_' + words[i + 1]);
+    return out;
+  }
+
+  // Multinomial naive Bayes with temperature scaling, so that confidence can be calibrated.
+  function trainNB(docs, labelKey, alpha = 0.3) {
+    const labels = [...new Set(docs.map(d => d[labelKey]))];
+    const counts = {}, totals = {}, prior = {}, vocab = new Set();
+    labels.forEach(l => { counts[l] = {}; totals[l] = 0; prior[l] = 0; });
+    docs.forEach(d => {
+      const l = d[labelKey]; prior[l]++;
+      tokens(d.text).forEach(t => { counts[l][t] = (counts[l][t] || 0) + 1; totals[l]++; vocab.add(t); });
+    });
+    return { labels, counts, totals, prior, V: vocab.size, N: docs.length, alpha, vocab };
+  }
+  function predictNB(m, text, T = 1) {
+    const toks = tokens(text).filter(t => m.vocab.has(t));
+    const logs = m.labels.map(l => {
+      let s = Math.log(m.prior[l] / m.N);
+      toks.forEach(t => { s += Math.log(((m.counts[l][t] || 0) + m.alpha) / (m.totals[l] + m.alpha * m.V)); });
+      return s;
+    });
+    const scale = Math.max(1, toks.length) * T; // length normalised so long tickets are not overconfident
+    const max = Math.max(...logs);
+    const raw = logs.map(s => Math.exp((s - max) / scale));
+    const sum = raw.reduce((a, b) => a + b, 0);
+    return m.labels.map((l, i) => ({ label: l, p: raw[i] / sum })).sort((a, b) => b.p - a.p);
+  }
+
+  function tfidf(docsTokens) {
+    const df = {};
+    docsTokens.forEach(ts => new Set(ts).forEach(t => { df[t] = (df[t] || 0) + 1; }));
+    const N = docsTokens.length;
+    const idf = t => Math.log((N + 1) / ((df[t] || 0) + 1)) + 1;
+    const vec = ts => {
+      const v = {}; ts.forEach(t => { v[t] = (v[t] || 0) + 1; });
+      let n = 0; Object.keys(v).forEach(t => { v[t] = v[t] * idf(t); n += v[t] * v[t]; });
+      n = Math.sqrt(n) || 1; Object.keys(v).forEach(t => { v[t] /= n; });
+      return v;
+    };
+    return { vec };
+  }
+  const cosine = (a, b) => { let s = 0; for (const t in a) if (b[t]) s += a[t] * b[t]; return s; };
+
+  function create({ config, train, incidents, deployments, runbooks, temperature = 1 }) {
+    const catModel = trainNB(train, 'cat');
+    const sevModel = trainNB(train, 'sev');
+    const incTokens = incidents.map(i => tokens(i.title + ' ' + i.symptoms));
+    const idx = tfidf(incTokens.concat(train.map(d => tokens(d.text))));
+    const incVecs = incTokens.map(idx.vec);
+
+    function severityOf(text, cat, marketHours) {
+      const c = config.categories[cat];
+      return marketHours ? c.floor_market : c.floor_off;
+    }
+    function isSecurity(text) {
+      const low = text.toLowerCase();
+      return config.security_rule.terms.filter(t => low.includes(t));
+    }
+
+    function triage(ticket) {
+      const probs = predictNB(catModel, ticket.text, temperature);
+      const top = probs[0];
+      const lowConf = top.p < config.confidence_threshold;
+      const sevProbs = predictNB(sevModel, ticket.text, temperature);
+      const modelSeverity = sevProbs[0].label;
+      const trail = [{ step: 'Model proposal', sev: modelSeverity, why: `Language signals in the report (${Math.round(sevProbs[0].p * 100)}% confidence)` }];
+      let sev = modelSeverity;
+      const floor = severityOf(ticket.text, top.label, ticket.marketHours);
+      if (RANK[floor] > RANK[sev]) trail.push({ step: 'Category floor', sev: floor, why: `${config.categories[top.label].label} ${ticket.marketHours ? 'in market hours' : 'off hours'} is never below ${floor}` });
+      sev = higher(sev, floor);
+      if (lowConf) { // when unsure, take the strictest floor of any plausible category
+        probs.filter(a => a.p >= config.uncertain_alternative_probability).forEach(a => {
+          const f = severityOf(ticket.text, a.label, ticket.marketHours);
+          if (RANK[f] > RANK[sev]) { trail.push({ step: 'Uncertainty floor', sev: f, why: `Could be ${config.categories[a.label].label} (${Math.round(a.p * 100)}%), so its floor applies` }); sev = f; }
+        });
+      }
+      const sec = isSecurity(ticket.text);
+      if (sec.length && RANK[config.security_rule.floor] > RANK[sev]) { trail.push({ step: 'Security rule', sev: config.security_rule.floor, why: `Report mentions "${sec[0]}"` }); sev = config.security_rule.floor; }
+      const cat = config.categories[top.label];
+      const reasons = [];
+      if (sec.length) reasons.push('possible security event');
+      if (lowConf) reasons.push(`low confidence (${Math.round(top.p * 100)}%)`);
+      if (cat.always_senior) reasons.push('possible execution failure');
+      return {
+        category: top.label, confidence: top.p, alternatives: probs.slice(1, 3), lowConfidence: lowConf,
+        modelSeverity, floorSeverity: floor, severity: sev, trail, security: sec.length > 0,
+        owner: sec.length ? config.security_rule.route : cat.owner,
+        senior: reasons.length > 0 || sev === 'S1', seniorReasons: reasons, level: cat.level,
+      };
+    }
+
+    // Suggests incidents only. A human confirms any merge in the interface.
+    function cluster(tickets) {
+      const vecs = tickets.map(t => idx.vec(tokens(t.text)));
+      const groups = [];
+      tickets.forEach((t, i) => {
+        const tri = t.triage || triage(t);
+        let best = null, bestSim = 0;
+        groups.forEach(g => {
+          if (g.category !== tri.category) return;
+          const last = tickets[g.members[g.members.length - 1]];
+          if (t.minute - last.minute > config.cluster.window_minutes || t.minute < last.minute) return;
+          const sim = Math.max(...g.members.map(m => cosine(vecs[i], vecs[m])));
+          if (sim >= bestSim) { bestSim = sim; best = g; }
+        });
+        // Same category inside the window: text similarity, or two sev-2+ reports in a burst.
+        const burst = best && RANK[tri.severity] >= RANK.S2 && t.minute - tickets[best.members[best.members.length - 1]].minute <= 6;
+        if (best && (bestSim >= config.cluster.similarity_threshold || burst)) best.members.push(i);
+        else groups.push({ category: tri.category, members: [i] });
+      });
+      return groups;
+    }
+
+    // Blast radius can only raise severity.
+    function applyBlastRadius(sev, reports, marketHours) {
+      let out = sev; const steps = [];
+      config.blast_radius.forEach(r => {
+        if (reports >= r.min_reports && (!r.market_hours_only || marketHours) && RANK[r.floor] > RANK[out]) {
+          out = r.floor; steps.push({ step: 'Blast radius', sev: r.floor, why: `${reports} clients reporting the same fault` });
+        }
+      });
+      return { severity: out, steps };
+    }
+
+    function hypotheses(text, category, minute) {
+      const v = idx.vec(tokens(text));
+      const scored = incidents.map((inc, i) => ({ inc, sim: cosine(v, incVecs[i]) + (inc.cat === category ? 0.1 : 0) })).sort((a, b) => b.sim - a.sim).slice(0, 6);
+      const byCause = {};
+      scored.forEach(({ inc, sim }) => {
+        if (sim <= 0) return;
+        const h = byCause[inc.cause] || (byCause[inc.cause] = { cause: inc.cause, score: 0, summary: inc.causeText, fix: inc.fix, evidence: [] });
+        h.score += sim;
+        h.evidence.push({ type: 'Past incident', id: inc.id, text: inc.title });
+      });
+      deployments.forEach(d => { // a release shortly before the report is evidence, not proof
+        if (minute !== undefined && minute >= d.minute && minute - d.minute <= 240 && byCause[d.cause]) {
+          byCause[d.cause].score *= 1.5;
+          byCause[d.cause].evidence.push({ type: 'Deployment', id: d.id, text: d.text });
+        }
+      });
+      const list = Object.values(byCause).sort((a, b) => b.score - a.score).slice(0, 3);
+      const total = list.reduce((a, h) => a + h.score, 0) || 1;
+      list.forEach(h => { h.weight = h.score / total; });
+      return list;
+    }
+
+    // Statements are only allowed with a citation. A missing cause stays a visible placeholder.
+    function draftUpdate({ reports, severity, category, confirmed, startedAt, approved }) {
+      const label = config.categories[category].label;
+      const cause = confirmed ? `Cause identified: ${confirmed.summary} [${confirmed.evidence[0].id}]` : '[CAUSE NOT CONFIRMED: engineer must select evidence before this can be sent]';
+      const impact = reports > 1 ? `${reports} client reports are linked to this incident.` : 'One client report is linked to this incident.';
+      const text = `We are investigating an issue first reported at ${startedAt} (type: ${label}). Priority: ${severity}. ${impact} ${cause} [NEXT UPDATE TIME: engineer to set]`;
+      const placeholders = (text.match(/\[[A-Z ]+[:][^\]]*\]/g) || []);
+      return { text, placeholders, canSend: !!approved && placeholders.length === 0 };
+    }
+    function closureNote({ category, confirmed, fix, severity, reports }) {
+      if (!confirmed) return '[Closure note blocked: no confirmed cause selected]';
+      return `Category: ${config.categories[category].label}. Final priority: ${severity}. Linked reports: ${reports}. Cause: ${confirmed.summary} Evidence: ${confirmed.evidence.map(e => e.id).join(', ')}. Fix applied by engineer: ${fix || confirmed.fix}. Closed by a human; TradeSentinel cannot close issues.`;
+    }
+
+    return { triage, cluster, applyBlastRadius, hypotheses, draftUpdate, closureNote, runbooks, config };
+  }
+
+  // Simple alternative used as the evaluation baseline.
+  const KEYWORDS = {
+    order_rejected: ['reject', 'refused', 'declined', 'invalid'], order_stuck: ['stuck', 'pending', 'hanging', 'no ack'],
+    execution_failed: ['failed', 'execution', 'did not fill', 'not execute'], fill_mismatch: ['mismatch', 'fill', 'position', 'allocation', 'recon'],
+    session_connectivity: ['fix', 'session', 'disconnect', 'logon', 'gateway', 'tls'], access_howto: ['how do', 'password', 'permission', 'where', 'guide'],
+  };
+  function keywordBaseline(text) {
+    const low = text.toLowerCase();
+    let best = 'access_howto', n = 0;
+    Object.entries(KEYWORDS).forEach(([c, ks]) => { const hit = ks.filter(k => low.includes(k)).length; if (hit > n) { n = hit; best = c; } });
+    const sev = /urgent|down|all |everything|loss|losing/.test(low) ? 'S1' : /fail|stuck|cannot|can't/.test(low) ? 'S2' : n ? 'S3' : 'S4';
+    return { category: best, severity: sev };
+  }
+
+  function parseData(raw) {
+    const lines = s => s.trim().split(/\r?\n/).map(l => l.split('|'));
+    return {
+      train: lines(raw.train).map(([cat, sev, text]) => ({ cat, sev, text })),
+      test: (raw.test ? lines(raw.test) : []).map(([id, split, cat, sev, mh, cl, minute, cause, text]) => ({ id, split, cat, sev, marketHours: mh === '1', cluster: cl, minute: +minute, cause, text })),
+      incidents: lines(raw.incidents).map(([id, cat, cause, title, symptoms, causeText, fix]) => ({ id, cat, cause, title, symptoms, causeText, fix })),
+      deployments: lines(raw.deployments).map(([id, component, minute, text, cause]) => ({ id, component, minute: +minute, text, cause })),
+      demo: lines(raw.demo).map(([id, mh, time, client, channel, text]) => ({ id, marketHours: mh === '1', time, client, channel, text, minute: (+time.slice(0, 2) - 9) * 60 + (+time.slice(3)) - 15 })),
+    };
+  }
+
+  return { create, keywordBaseline, parseData, tokens, RANK, SEV, higher };
+});
+</script>
+<script>
+const RAW={"train":"order_rejected|S3|My limit order was rejected as soon as I sent it, reject reason says price outside band\norder_rejected|S3|Getting a reject on every order in this symbol, message says invalid tick size\norder_rejected|S3|Order refused by the system with error lot size not valid\norder_rejected|S3|Why was my buy order rejected? It says exceeds pre-trade risk limit but my limit should be higher\norder_rejected|S2|All our desk orders are being rejected by risk check since this morning, we cannot enter anything\norder_rejected|S3|Order rejected, code 2051 instrument not found, symbol was traded fine yesterday\norder_rejected|S4|One order got rejected because I typed wrong quantity, what does reject code 1033 mean\norder_rejected|S3|Rejection message margin insufficient but the account has been funded\norder_rejected|S3|Portal shows order status rejected with no reason text\norder_rejected|S2|Every new order from our algo is bouncing with a credit limit reject during the open\norder_rejected|S3|Stop loss order rejected at entry, trigger price not accepted\norder_rejected|S3|Venue is rejecting my orders for this new listing, says symbol halted but it is not\norder_rejected|S4|Order was declined once then went through on retry, want to know why it declined\norder_rejected|S3|Basket upload failed validation, half the lines rejected for invalid instrument code\norder_rejected|S2|Risk gateway rejecting all clients orders after the limit file load\norder_rejected|S3|My order fails at entry with price band error even though price is inside the band\norder_rejected|S3|Cannot place orders in this contract, rejected as restricted instrument\norder_rejected|S3|Modify request was rejected, replace not allowed, original order still live\norder_stuck|S2|My orders are stuck in pending and I cannot cancel them, market is moving\norder_stuck|S2|Order has been sitting in open pending status for ten minutes with no acknowledgement\norder_stuck|S1|All orders across our desk are hanging with no ack from the exchange during market hours\norder_stuck|S3|Cancel request sent but order still shows working after several minutes\norder_stuck|S2|No confirmation on my order, screen just spins, status not updating\norder_stuck|S2|Order not moving from new to acknowledged, been waiting a long time\norder_stuck|S3|Screen shows order pending, not sure if it reached the market\norder_stuck|S1|Queue is backed up, nobody can get orders out, everything pending since the open\norder_stuck|S3|Order status frozen in my blotter, needs refresh to update\norder_stuck|S2|Sent a replace and it never came back, order stuck in pending replace\norder_stuck|S2|Orders are very slow to acknowledge today, taking over a minute each\norder_stuck|S3|My order after market close still shows pending from today\norder_stuck|S2|Cannot cancel working order, cancel just times out, worried about being filled\norder_stuck|S2|Orders hang when I submit, no ack no reject nothing\norder_stuck|S3|Good till cancelled order stuck in queued state since last evening\norder_stuck|S1|Everyone on our floor reports orders stuck, cannot exit positions in a fast market\norder_stuck|S3|Blotter stuck on order sent state for one order\norder_stuck|S2|Order acknowledgement delayed and the status is stale across my orders\nexecution_failed|S1|Many clients report orders went to market but executions failed and positions are wrong\nexecution_failed|S2|My order was accepted but failed to execute, venue shows no trade\nexecution_failed|S2|Execution failed with internal error after order was routed\nexecution_failed|S2|Market order did not fill even though there was plenty of liquidity\nexecution_failed|S2|Partial fill then the remainder vanished, no cancel message\nexecution_failed|S1|Smart router sending orders nowhere, executions failing across all accounts during the open\nexecution_failed|S2|IOC order expired unfilled when the book clearly had size at my price\nexecution_failed|S2|Order routed but execution report says failed, client lost the trade\nexecution_failed|S1|Fatal execution error on all outgoing orders, clients are losing money right now\nexecution_failed|S3|After hours order failed to execute, can be reviewed tomorrow\nexecution_failed|S2|My sell did not execute and now the price has dropped, trade should have gone through\nexecution_failed|S2|Trade busted without notice, execution reversed on my account\nexecution_failed|S2|Algo slice failed to execute and parent order is stuck half complete\nexecution_failed|S2|Exit order failed during the sell off, I am exposed\nexecution_failed|S1|Exchange link failing executions for every client, large losses reported\nexecution_failed|S3|Order failed to fill in pre-market session, low urgency\nexecution_failed|S2|Remaining quantity dropped silently after a partial execution\nexecution_failed|S2|Order was routed to the wrong venue segment and did not execute\nfill_mismatch|S3|My fill quantity on the portal does not match the contract note\nfill_mismatch|S3|Executed price shown is different from what the venue confirms\nfill_mismatch|S3|Position is off by 200 shares compared to my trades today\nfill_mismatch|S2|Our positions are wrong after the morning fills, risk numbers do not tie out\nfill_mismatch|S3|Trade appears twice in my trade book, duplicate fill showing\nfill_mismatch|S3|Fill reported on venue but missing from my blotter\nfill_mismatch|S4|Small rounding difference in average price on yesterday's trade\nfill_mismatch|S3|Allocation to sub accounts is wrong, block fill split incorrectly\nfill_mismatch|S2|Drop copy does not match our fills, several hundred trades unreconciled\nfill_mismatch|S3|End of day reconciliation break on three trades\nfill_mismatch|S3|Average price on the blotter differs from the broker confirm\nfill_mismatch|S3|My holdings did not update after the trade was filled\nfill_mismatch|S2|Positions showing double after fills, cannot trust our exposure\nfill_mismatch|S4|Contract note has a different commission from what I expected\nfill_mismatch|S3|Allocated quantity missing from one fund after block trade\nfill_mismatch|S3|Trade history is missing two fills I can see in the exchange report\nfill_mismatch|S3|P and L wrong because a fill was booked at wrong price\nfill_mismatch|S2|Reconciliation breaks across all accounts since today's release\nsession_connectivity|S2|Our FIX session keeps disconnecting every few minutes\nsession_connectivity|S1|FIX gateway is down, we have lost connectivity to the venue during market hours\nsession_connectivity|S2|Sequence number mismatch on logon, session will not establish\nsession_connectivity|S2|Cannot log on to the order gateway, heartbeat timeout\nsession_connectivity|S2|API connection dropping with socket reset\nsession_connectivity|S3|Test FIX session not connecting in UAT\nsession_connectivity|S2|Certificate error when connecting to the gateway, TLS handshake failed\nsession_connectivity|S1|All client sessions dropped at the same time, nobody is connected\nsession_connectivity|S2|High latency on the line to the venue, heartbeats being missed\nsession_connectivity|S3|Session reset needed after weekend, logon rejected out of sequence\nsession_connectivity|S2|Trading API returning connection refused since a few minutes\nsession_connectivity|S2|Websocket for order updates keeps dropping\nsession_connectivity|S3|Disconnects in the evening after market hours, no live orders\nsession_connectivity|S1|Primary and backup lines both down, we are disconnected from the market\nsession_connectivity|S2|Network path to gateway flapping, resend requests piling up\nsession_connectivity|S3|Need FIX sequence reset before tomorrow open\nsession_connectivity|S2|Terminal shows disconnected from server and will not reconnect\nsession_connectivity|S2|Client gateway TLS certificate expired and session refused\naccess_howto|S4|How do I add a new user to my trading account\naccess_howto|S4|Forgot my password for the trading portal, need a reset\naccess_howto|S4|Where can I download my contract notes\naccess_howto|S3|I cannot see the derivatives segment in my terminal, need permission enabled\naccess_howto|S4|How do I set up a bracket order on the platform\naccess_howto|S4|Please explain what the order type good till date means\naccess_howto|S3|New trader cannot log in, account locked after attempts\naccess_howto|S4|Can you share the user guide for the new terminal version\naccess_howto|S4|How do I change my default order quantity setting\naccess_howto|S3|Entitlement missing for market depth screen after role change\naccess_howto|S4|Need a report of last month trades, where is it\naccess_howto|S4|What are the hours for the pre open session\naccess_howto|S3|My account is not enabled to trade this segment, who can activate it\naccess_howto|S4|Request to reset two factor device for a user\naccess_howto|S4|How to export my blotter to excel\naccess_howto|S3|Permission denied when opening the order entry screen, role issue\naccess_howto|S4|Question on how margin is displayed on the dashboard\naccess_howto|S4|Please add my colleague to the alerts mailing list\n","test":"","incidents":"INC-2101|order_rejected|risk_limit_config|Client flow rejected on credit limit after nightly limit file load|credit limit reject all orders risk check breach exposure limit limit file|Nightly limit file loaded with a stale version and reduced client limits.|Reload the correct limit file; risk owner approves\nINC-2117|order_rejected|venue_rule_change|Rejects on tick size after venue price band circular|tick size invalid price band outside band reject amend not allowed venue rule|Venue changed price bands; gateway validation table not updated.|Update validation table from venue circular\nINC-2133|order_rejected|symbol_master_stale|Instrument not found for new listing|instrument not found unknown symbol new listing suspended halted isin invalid basket|Security master feed missed the overnight update.|Re-run security master sync\nINC-2140|order_rejected|risk_limit_config|Margin reject although funds credited|margin insufficient shortfall funds credited reject|Collateral update batch ran late so the margin limit was stale.|Re-run collateral batch; confirm limit\nINC-2152|order_rejected|venue_rule_change|Lot size rejects after contract revision|lot size invalid quantity reject error code contract|Contract lot size revised by the venue; order form not updated.|Update contract parameters\nINC-2204|order_stuck|oms_queue_backlog|OMS outbound queue backlog at the open|pending stuck queue no ack hanging orders cannot cancel floor backlog|OMS outbound queue saturated; consumer thread pool exhausted.|Restart consumer pool per runbook; clear queue\nINC-2219|order_stuck|venue_ack_timeout|Slow acknowledgements from venue gateway|ack slow acknowledgement delayed cancel timeout replace no confirmation|Venue gateway degraded; acknowledgements above timeout.|Open venue ticket; fail over to secondary gateway\nINC-2226|order_stuck|oms_queue_backlog|Single order frozen after blotter cache miss|frozen blotter status not updating queued gtc pending stale|Blotter cache lag; order state correct at OMS.|Refresh order state from OMS\nINC-2238|order_stuck|venue_ack_timeout|Orders unconfirmed during venue maintenance window|no response nothing returned not filled not rejected sent minutes|Venue maintenance overran; no acknowledgements returned.|Confirm with venue; hold retries\nINC-2305|execution_failed|router_fault|Smart router failing child orders after release|router failed execution internal error routed no trade accounts losses wrong segment|Router release introduced a null route for one segment.|Engineer approves router rollback through change process\nINC-2318|execution_failed|venue_partial_outage|Venue matching partition outage|partial fill remainder disappeared cancelled exit not executed trade reversed busted|Venue matching partition failed and unsolicited cancels were sent.|Reconcile with venue; notify clients\nINC-2324|execution_failed|router_fault|Algo child orders dropped on router timeout|algo child slice parent half complete never traded failed|Router timeout on the algo path dropped child orders.|Restart algo path; re-drive with approval\nINC-2331|execution_failed|venue_partial_outage|IOC expiries during venue degradation|ioc expired unfilled book depth market order did not fill touch nothing done|Venue book feed degraded; orders expired without matching.|Confirm with venue; compile affected orders\nINC-2402|fill_mismatch|dropcopy_gap|Drop copy gap after release|drop copy recon break positions tie exchange missing fill blotter holdings duplicate doubled|Drop copy consumer dropped messages after restart.|Replay drop copy from last good sequence\nINC-2415|fill_mismatch|allocation_rule_error|Block allocation split wrongly|allocation block sub account fund split short share|Allocation rule table carried an old fund percentage.|Correct rule; re-book with post-trade approval\nINC-2421|fill_mismatch|dropcopy_gap|Duplicate fills on portal|same trade twice duplicate fill listed portal confirm quantity differs|Portal replayed drop copy without de-duplication.|De-duplicate and refresh positions\nINC-2433|fill_mismatch|user_error_training|Average price rounding question|average price rounding paisa brokerage commission contract note|Display rounding and fee schedule, no system fault.|Explain to client; share fee schedule\nINC-2501|session_connectivity|fix_seq_gap|FIX sequence mismatch after restart|sequence logon refused resend reset fix session keeps resetting websocket cutting|Sequence store not persisted across restart.|Reset sequence with counterparty approval\nINC-2514|session_connectivity|cert_expiry|Gateway TLS certificate expired|tls handshake certificate cert failure expired gateway|Certificate expired at midnight and the renewal job failed.|Install renewed certificate through change process\nINC-2522|session_connectivity|network_path|Both lines down to venue|lines dead lost venue unreachable all sessions dropped disconnected reconnect|Carrier fault on the shared network path.|Invoke carrier failover; open a carrier ticket\nINC-2530|session_connectivity|network_path|Latency spike and missed heartbeats|latency heartbeat dropped flapping socket closes terminal offline|Congested route between data centre and venue.|Reroute traffic with network team approval\nINC-2601|access_howto|entitlement_missing|Segment not visible after role change|segment not visible permission role entitlement locked out not authorised add colleague|Role change removed the entitlement.|Re-grant entitlement with manager approval\nINC-2615|access_howto|user_error_training|How-to and guide questions|how do i where guide report time pre-open default quantity order type|Knowledge gap, no system fault.|Share guide and knowledge base link\n","deployments":"DEP-881|oms|-30|OMS 7.3 outbound queue configuration change|oms_queue_backlog\nDEP-882|risk|110|Limit file loader patch|risk_limit_config\nDEP-883|router|60|Smart order router release 4.2|router_fault\nDEP-884|dropcopy|225|Drop copy consumer upgrade|dropcopy_gap\n","demo":"T-1001|1|09:52|Meridian Capital|Portal|My orders are stuck, nothing moving, I cannot cancel and the market is falling\nT-1002|1|09:53|Northgate Securities|Email|pending on all orders since 9:50, no acknowledgement on any of them. Urgent.\nT-1003|1|09:55|Asha Fund Managers|Chat|Everything sits in queue. Can't cancel, can't send.\nT-1004|1|09:56|Kestrel Partners|Portal|Order screen hanging, all tickets waiting on ack\nT-1005|1|10:04|Lotus Wealth|Chat|Quick question, nothing major - my IOC partly filled and the rest disappeared?\nT-1006|1|10:20|Harbour Trading|Email|Credit limit reject on an order, our risk team raised the limit last week\nT-1007|1|10:31|Orchid Advisors|Portal|How do I change my default order quantity on the terminal?\nT-1008|1|10:44|Zenith Dealers|Chat|Portal says 500 filled but the venue confirm says 450\nT-1009|1|11:02|Vega Markets|Email|Someone logged in to my account from an unknown location and I did not authorise it\nT-1010|1|11:15|Saffron Capital|Chat|Hello team, just wondering about an order from a while ago, no update so far\nT-1011|1|11:40|Delta Brokers|Portal|Logon refused, sequence number too low, our FIX session is down\nT-1012|1|12:05|Indigo Funds|Email|Getting error 2047 when I enter\n"}, E=TradeSentinelEngine, D=E.parseData(RAW), HOLD={
+  "split": "holdout",
+  "n": 70,
+  "trainN": 108,
+  "temperature": 0.25,
+  "confidenceThreshold": 0.55,
+  "category": {
+    "accuracy": 90,
+    "correct": 63,
+    "baselineAccuracy": 45.7,
+    "baselineCorrect": 32,
+    "macroF1": 0.899,
+    "baselineMacroF1": 0.486,
+    "top2": 95.7,
+    "perCat": [
+      {
+        "category": "order_rejected",
+        "n": 13,
+        "correct": 11
+      },
+      {
+        "category": "order_stuck",
+        "n": 13,
+        "correct": 13
+      },
+      {
+        "category": "execution_failed",
+        "n": 14,
+        "correct": 12
+      },
+      {
+        "category": "fill_mismatch",
+        "n": 10,
+        "correct": 9
+      },
+      {
+        "category": "session_connectivity",
+        "n": 10,
+        "correct": 10
+      },
+      {
+        "category": "access_howto",
+        "n": 10,
+        "correct": 8
+      }
+    ]
+  },
+  "calibration": {
+    "ece": 0.083,
+    "bins": [
+      {
+        "range": "0.0-0.2",
+        "n": 0,
+        "meanConfidence": null,
+        "accuracy": null
+      },
+      {
+        "range": "0.2-0.4",
+        "n": 3,
+        "meanConfidence": 0.36,
+        "accuracy": 0.67
+      },
+      {
+        "range": "0.4-0.6",
+        "n": 9,
+        "meanConfidence": 0.52,
+        "accuracy": 0.56
+      },
+      {
+        "range": "0.6-0.8",
+        "n": 13,
+        "meanConfidence": 0.7,
+        "accuracy": 0.92
+      },
+      {
+        "range": "0.8-1.0",
+        "n": 45,
+        "meanConfidence": 0.94,
+        "accuracy": 0.98
+      }
+    ]
+  },
+  "severity": {
+    "nCritical": 41,
+    "nS1": 13,
+    "nMinor": 29,
+    "table": [
+      {
+        "name": "TradeSentinel (floors + blast radius)",
+        "criticalRecall": 97.6,
+        "missed": [
+          "H68"
+        ],
+        "falseEscalationRate": 13.8,
+        "netPayoffPerIssue": {
+          "0.01": 50,
+          "0.05": 196,
+          "0.1": 378
+        }
+      },
+      {
+        "name": "Model alone, no control layer",
+        "criticalRecall": 82.9,
+        "missed": [
+          "H32",
+          "H36",
+          "H55",
+          "H66",
+          "H67",
+          "H68",
+          "H69"
+        ],
+        "falseEscalationRate": 10.3,
+        "netPayoffPerIssue": {
+          "0.01": -24,
+          "0.05": -200,
+          "0.1": -421
+        }
+      },
+      {
+        "name": "Keyword rules baseline",
+        "criticalRecall": 43.9,
+        "missed": [
+          "H48",
+          "H50",
+          "H13",
+          "H14",
+          "H18",
+          "H51",
+          "H29",
+          "H08",
+          "H31",
+          "H20",
+          "H32",
+          "H33",
+          "H53",
+          "H21",
+          "H40",
+          "H42",
+          "H36",
+          "H55",
+          "H66",
+          "H37",
+          "H67",
+          "H57",
+          "H69"
+        ],
+        "falseEscalationRate": 10.3,
+        "netPayoffPerIssue": {
+          "0.01": -238,
+          "0.05": -1273,
+          "0.1": -2567
+        }
+      },
+      {
+        "name": "Escalate everything",
+        "criticalRecall": 100,
+        "missed": [],
+        "falseEscalationRate": 100,
+        "netPayoffPerIssue": {
+          "0.01": -98,
+          "0.05": 108,
+          "0.1": 365
+        }
+      },
+      {
+        "name": "Escalate nothing",
+        "criticalRecall": 0,
+        "missed": [
+          "H48",
+          "H49",
+          "H50",
+          "H13",
+          "H14",
+          "H15",
+          "H16",
+          "H17",
+          "H18",
+          "H19",
+          "H25",
+          "H26",
+          "H27",
+          "H28",
+          "H51",
+          "H29",
+          "H30",
+          "H52",
+          "H05",
+          "H06",
+          "H07",
+          "H08",
+          "H31",
+          "H20",
+          "H32",
+          "H33",
+          "H53",
+          "H21",
+          "H35",
+          "H40",
+          "H41",
+          "H42",
+          "H36",
+          "H55",
+          "H24",
+          "H66",
+          "H37",
+          "H67",
+          "H57",
+          "H68",
+          "H69"
+        ],
+        "falseEscalationRate": 0,
+        "netPayoffPerIssue": {
+          "0.01": -460,
+          "0.05": -2462,
+          "0.1": -4964
+        }
+      }
+    ],
+    "underS1S2": [
+      {
+        "id": "H49",
+        "truth": "S1",
+        "got": "S2",
+        "text": "All sessions dropped at 9:15 for our firm, can't reconnect."
+      },
+      {
+        "id": "H50",
+        "truth": "S1",
+        "got": "S2",
+        "text": "Gateway unreachable, market is open and we are blind."
+      },
+      {
+        "id": "H68",
+        "truth": "S2",
+        "got": "S3",
+        "text": "Not urgent, but my limit order that should have traded at the touch shows nothing done."
+      }
+    ],
+    "overTriageRate": 17.2
+  },
+  "clustering": {
+    "pairs": {
+      "tp": 33,
+      "fp": 0,
+      "fn": 0
+    },
+    "precision": 100,
+    "recall": 100,
+    "trueClusters": 5,
+    "suggestedMultiGroups": 5,
+    "tickets": 70,
+    "incidents": 55
+  },
+  "rootCause": {
+    "n": 62,
+    "top1": 80.6,
+    "top3": 96.8,
+    "misses": [
+      "H09",
+      "H66"
+    ]
+  },
+  "routing": {
+    "wrongCategory": 7,
+    "wrongCaughtBySeniorReview": 5,
+    "wrongNotCaught": [
+      {
+        "id": "H09",
+        "truth": "order_rejected",
+        "got": "fill_mismatch",
+        "conf": 0.71,
+        "text": "Security is marked suspended on your side but it's trading normally at the exchange."
+      },
+      {
+        "id": "H68",
+        "truth": "execution_failed",
+        "got": "order_rejected",
+        "conf": 0.82,
+        "text": "Not urgent, but my limit order that should have traded at the touch shows nothing done."
+      }
+    ],
+    "sentToSenior": 34.3,
+    "correctAndNotSenior": 62.9
+  },
+  "invariants": {
+    "severityNeverLowered": true,
+    "floorAlwaysApplied": true,
+    "unconfirmedCauseCannotSend": true,
+    "hypothesesAlwaysCiteEvidence": true,
+    "unapprovedCannotSend": true
+  },
+  "latencyMsPerTriage": 0.02
+};
+const cfg={
+  "version": "1.0-mvp",
+  "severity_scale": ["S4", "S3", "S2", "S1"],
+  "confidence_threshold": 0.55,
+  "uncertain_alternative_probability": 0.2,
+  "cluster": { "similarity_threshold": 0.3, "window_minutes": 30 },
+  "blast_radius": [ { "min_reports": 3, "floor": "S2" }, { "min_reports": 4, "floor": "S1", "market_hours_only": true } ],
+  "security_rule": { "floor": "S2", "route": "Senior Engineer + Security", "terms": ["unauthorised","unauthorized","authorise","authorize","suspicious","compromise","unknown location","credential","fraud"] },
+  "never_allowed": ["downgrade_severity","close_issue","merge_issue","production_deploy_or_rollback","send_unapproved_update","state_uncited_cause"],
+  "categories": {
+    "order_rejected":       { "label": "Order rejected",           "owner": "Order Gateway Support",  "level": "L2", "floor_market": "S3", "floor_off": "S4", "always_senior": false },
+    "order_stuck":          { "label": "Order stuck / no ack",     "owner": "Order Management (OMS)", "level": "L2", "floor_market": "S2", "floor_off": "S3", "always_senior": false },
+    "execution_failed":     { "label": "Execution failed",         "owner": "Execution Engineering",  "level": "L1", "floor_market": "S2", "floor_off": "S3", "always_senior": true, "held_reason": "Held at L1 on purpose: a miss in this category costs the most." },
+    "fill_mismatch":        { "label": "Fill / position mismatch", "owner": "Post-Trade Engineering", "level": "L2", "floor_market": "S3", "floor_off": "S4", "always_senior": false },
+    "session_connectivity": { "label": "Session / connectivity",   "owner": "Connectivity Support",   "level": "L2", "floor_market": "S2", "floor_off": "S3", "always_senior": false },
+    "access_howto":         { "label": "Access / how-to",          "owner": "Client Service Desk",    "level": "L2", "floor_market": "S4", "floor_off": "S4", "always_senior": false }
+  }
+}
+, runbooks={
+  "order_rejected": ["Pull the reject code and the order ID from the gateway log","Compare the reject against the client's limits and the venue rule table","Check whether a limit file or security master load ran today","If a limit or table is wrong, raise it with the risk owner for approval","Ask the client to retry only after the fix is confirmed"],
+  "order_stuck": ["Confirm order state at the OMS, not just the blotter","Check outbound queue depth and venue acknowledgement latency","Check deployments in the last 24 hours touching the OMS","If the queue is saturated, request approval to restart the consumer pool","Reconcile every affected order with the venue before telling clients they are safe"],
+  "execution_failed": ["Bring in the senior engineer before any action","Fetch the execution report and the venue's record of the order","Check the router logs and any router release in the last 24 hours","List the affected orders and clients; quantify exposure","Any rollback goes through the change process; TradeSentinel cannot run it"],
+  "fill_mismatch": ["Compare the fill across portal, OMS, drop copy and venue report","Check the drop copy sequence for gaps","Check allocation rules if a block trade is involved","Propose the corrected booking for post-trade approval","Confirm the position with the client after correction"],
+  "session_connectivity": ["Check session state, sequence numbers and last heartbeat","Check certificate expiry and the network path status","Check whether other clients on the gateway are affected","Request approval for a sequence reset or a failover","Confirm in-flight orders after reconnecting"],
+  "access_howto": ["Check whether this is a question or a missing entitlement","Share the matching guide if it is a question","If access is missing, get the manager's approval and grant the role","If anything suggests unauthorised access, stop and escalate to security"]
+}
+, PAPER={
+  "_status": "PAPER SPECIFICATION ONLY. Not run in the prototype. Tests whether a harder category fits the same workflow.",
+  "category_id": "market_data_feed_delay",
+  "label": "Market data feed delay",
+  "owner": "Market Data Engineering",
+  "level": "L0",
+  "floor_market": "S2",
+  "floor_off": "S3",
+  "always_senior": false,
+  "input": { "type": "machine_alert", "required_fields": ["feed_id","venue","lag_ms","first_seen"], "classifier_needed": false },
+  "cluster": { "strategy": "key_window", "key": ["feed_id","venue"], "window_minutes": 15 },
+  "blast_radius": [ { "min_clients_entitled": 20, "floor": "S1", "market_hours_only": true } ],
+  "severity_inputs": { "lag_ms_floor": [ { "min_lag_ms": 1000, "floor": "S3" }, { "min_lag_ms": 5000, "floor": "S2" } ] },
+  "runbook": ["Confirm lag at the feed handler","Compare primary and secondary feeds","Request approval to fail over","Tell entitled clients once the cause is cited"],
+  "client_update": { "audience": "all_entitled_clients", "approval": "senior_engineer" }
+}
+;
+const eng=E.create({config:cfg,train:D.train,incidents:D.incidents,deployments:D.deployments,runbooks,temperature:HOLD.temperature});
+const LEVEL={L0:'Shadow',L1:'Suggest',L2:'Assisted',L3:'Limited auto'};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pc=x=>Math.round(x*100)+'%';
+const S={tab:'queue',sel:'T-1001',tickets:D.demo.map(t=>({...t,st:{opened:null,routed:false,owner:null,override:null,merge:false,cause:null,steps:{},fix:false,next:'',approved:false,sent:false,closed:false}})),audit:[],n:1013};
+function log(m){const d=new Date().toTimeString().slice(0,8);S.audit.unshift(d+'  '+m)}
+function recompute(){
+  const mh=document.getElementById('mh').checked;
+  S.tickets.forEach(t=>{t.marketHours=mh;t.triage=eng.triage(t)});
+  const g=eng.cluster(S.tickets);
+  g.forEach((gr,i)=>gr.members.forEach(m=>{const t=S.tickets[m];const b=eng.applyBlastRadius(t.triage.severity,gr.members.length,t.marketHours);
+    t.group=i;t.reports=gr.members.length;t.peers=gr.members.map(x=>S.tickets[x].id);t.sev=b.severity;t.fullTrail=t.triage.trail.concat(b.steps)}));
+}
+const cur=()=>S.tickets.find(t=>t.id===S.sel);
+function nav(){document.getElementById('nav').innerHTML=[['queue','Triage queue'],['control','Control layer'],['evidence','Evaluation evidence']].map(([k,l])=>`<button role="tab" aria-selected="${S.tab===k}" data-tab="${k}">${l}</button>`).join('')}
+function queue(){
+  const order=[...S.tickets].sort((a,b)=>E.RANK[b.sev]-E.RANK[a.sev]||a.minute-b.minute);
+  return `<section class="panel queue"><h2>Queue, highest priority first</h2>${order.map(t=>`<button class="tk" data-t="${t.id}" aria-current="${t.id===S.sel}"><span class="sev ${t.sev}">${t.sev}</span><span><span class="txt">${esc(t.text)}</span><span class="meta">${t.id} · ${esc(t.client)} · ${t.time}${t.reports>1?` · <span class="chip m">${t.reports} linked</span>`:''}${t.triage.lowConfidence?' · <span class="chip">unsure</span>':''}${t.st.closed?' · closed':''}</span></span></button>`).join('')}
+  <h3 style="margin-top:12px">Add a report</h3><label class="small muted" for="newt">Type any client message to see it triaged live</label><textarea id="newt" placeholder="e.g. my sell order went through but nothing shows at the exchange"></textarea><div class="row" style="margin-top:6px"><button class="act alt" id="add">Triage this report</button></div></section>`;
+}
+function triageCard(t){
+  const r=t.triage,c=cfg.categories[r.category],lvl=c.level;
+  return `<section class="panel"><div class="row" style="justify-content:space-between"><h2>${t.id}: ${esc(t.client)} via ${t.channel}, ${t.time}</h2><span class="sev ${t.sev}" style="font-size:15px">${t.sev}</span></div><p style="margin:0 0 10px">“${esc(t.text)}”</p>
+  ${r.senior||t.sev==='S1'?`<div class="senior"><b>Senior engineer required:</b> ${esc((r.seniorReasons.concat(t.sev==='S1'?['critical priority']:[])).join('; '))}.</div>`:''}
+  ${lvl==='L0'?'<p class="muted">Shadow mode: suggestions for this category are recorded but hidden. The engineer triages unaided.</p>':`<div class="cols" style="margin-top:10px"><div><h3>What the AI read</h3><div class="row"><b>${esc(c.label)}</b><span class="muted">${pc(r.confidence)}</span></div><div class="bar" role="img" aria-label="Confidence ${pc(r.confidence)}"><i style="width:${pc(r.confidence)}"></i></div>
+  <p class="small muted" style="margin:6px 0 0">Also possible: ${r.alternatives.map(a=>esc(cfg.categories[a.label].label)+' '+pc(a.p)).join(', ')}</p>
+  ${r.lowConfidence?'<p class="small" style="margin:6px 0 0"><b>Below the confidence threshold.</b> The strictest floor of any plausible category applies, and a senior engineer reviews.</p>':''}</div>
+  <div><h3>How severity was set (it can only go up)</h3><ol class="trail">${t.fullTrail.map(s=>`<li><span class="sev ${s.sev}">${s.sev}</span><span><b>${s.step}.</b> ${esc(s.why)}</span></li>`).join('')}</ol></div></div>`}
+  ${t.reports>1?`<p style="margin:10px 0 0" class="small"><b>Suggested incident:</b> ${t.peers.join(', ')} look like one fault. ${t.st.merge?'<span class="pass">Merged by engineer.</span>':'<button class="act alt" id="merge">Confirm merge</button> <span class="muted">Nothing merges without a person.</span>'}</p>`:''}
+  </section>`;
+}
+function decision(t){
+  const r=t.triage,c=cfg.categories[r.category],lvl=c.level,st=t.st,owners=[...new Set(Object.values(cfg.categories).map(x=>x.owner).concat([cfg.security_rule.route]))];
+  const pre=lvl==='L2';
+  return `<section class="panel"><div class="row" style="justify-content:space-between"><h2>Your decision</h2><span class="chip m">${lvl} ${LEVEL[lvl]}</span></div>
+  ${c.held_reason?`<p class="small muted" style="margin:0 0 8px">${esc(c.held_reason)}</p>`:''}
+  ${st.routed?`<p><span class="pass">Routed to ${esc(st.owner)}</span>${st.override?` <span class="muted">(override: ${esc(st.override)})</span>`:''}</p>`:`
+  <div class="row"><label for="owner">Owner</label><select id="owner">${pre?'':'<option value="">Choose an owner</option>'}${owners.map(o=>`<option ${pre&&o===r.owner?'selected':''}>${esc(o)}</option>`).join('')}</select>
+  ${lvl!=='L0'&&!pre?`<span class="small muted">AI suggests: ${esc(r.owner)}</span>`:''}</div>
+  <div class="row" style="margin-top:8px"><label for="sev">Priority</label><select id="sev">${['S1','S2','S3','S4'].map(s=>`<option ${s===t.sev?'selected':''}>${s}</option>`).join('')}</select><span class="small muted">Only a person can lower priority, and it needs a reason.</span></div>
+  <div class="row" style="margin-top:8px"><label for="why">Reason (needed if you change anything)</label><input type="text" id="why" style="flex:1;min-width:180px"></div>
+  <p id="err" class="small fail" style="margin:6px 0 0" hidden></p>
+  <div class="row" style="margin-top:8px"><button class="act" id="route">${pre?'Approve pre-filled routing':'Confirm my routing'}</button></div>`}
+  <h3 style="margin-top:12px">Never allowed at any level</h3><div class="never"><span>Auto-downgrade</span><span>Auto-close</span><span>Auto-merge</span><span>Deploy or roll back in production</span><span>Send an unapproved update</span><span>State an uncited cause</span></div></section>`;
+}
+function resolution(t){
+  const r=t.triage,st=t.st;
+  if(!st.routed) return `<section class="panel"><h2>Resolution assistant</h2><p class="muted">Opens once routing is decided. Past incidents, ranked causes, runbook and the client update appear here.</p></section>`;
+  const hs=eng.hypotheses(t.text,r.category,t.minute),conf=st.cause!==null?hs[st.cause]:null;
+  const dr=eng.draftUpdate({reports:t.reports,severity:t.sev,category:r.category,confirmed:conf,startedAt:t.time,approved:st.approved});
+  const text=st.next?dr.text.replace(/\[NEXT UPDATE TIME:[^\]]*\]/,'Next update by '+esc(st.next)+'.'):dr.text;
+  const holes=(text.match(/\[[A-Z ]+:[^\]]*\]/g)||[]).length;
+  return `<section class="panel stack"><h2>Resolution assistant</h2>
+  <div><h3>Likely causes, with the evidence for each</h3><div class="stack" style="gap:8px">${hs.map((h,i)=>`<div class="hyp ${st.cause===i?'sel':''}"><div class="row" style="justify-content:space-between"><b>${esc(h.summary)}</b><span class="muted small">${pc(h.weight)} of evidence weight</span></div>${h.evidence.map(e=>`<span class="ev">${e.type} ${e.id}: ${esc(e.text)}</span>`).join('')}<div><button class="act alt" data-cause="${i}">${st.cause===i?'Selected as cause':'Confirm as cause'}</button></div></div>`).join('')}</div><p class="small muted" style="margin:6px 0 0">Evidence weight is a ranking aid and is not a probability.</p></div>
+  <div class="cols"><div><h3>Runbook</h3><ol class="rb">${runbooks[r.category].map((s,i)=>`<li><label><input type="checkbox" data-step="${i}" ${st.steps[i]?'checked':''}> <span>${esc(s)}</span></label></li>`).join('')}</ol></div>
+  <div><h3>Recommended fix</h3>${conf?`<p style="margin:0 0 6px">${esc(conf.fix)}</p>${st.fix?'<span class="pass">Approved. The engineer runs it through the change process.</span>':'<button class="act alt" id="fix">Approve fix for engineer to run</button>'}`:'<p class="muted" style="margin:0">Confirm a cause first.</p>'}</div></div>
+  <div><h3>Client update draft</h3><div class="draft">${esc(text).replace(/\[[A-Z ]+:[^\]]*\]/g,m=>`<mark>${m}</mark>`)}</div>
+  <div class="row" style="margin-top:8px"><label for="next">Next update time</label><input type="time" id="next" value="${esc(st.next)}">
+  ${st.sent?'<span class="pass">Marked as sent (simulated).</span>':`<button class="act" id="send" ${holes?'disabled':''}>Approve and send</button>${holes?`<span class="small muted">${holes} blank${holes>1?'s':''} left. The system will not fill these by guessing.</span>`:''}`}</div></div>
+  <div><h3>Closure note</h3><div class="draft">${esc(eng.closureNote({category:r.category,confirmed:conf,severity:t.sev,reports:t.reports}))}</div><div class="row" style="margin-top:8px">${st.closed?'<span class="pass">Closed by the engineer.</span>':`<button class="act alt" id="close" ${conf&&st.sent?'':'disabled'}>Close issue (human action)</button>`}</div></div></section>`;
+}
+function queueView(){
+  const t=cur(); if(!t.st.opened) t.st.opened=Date.now();
+  const routed=S.tickets.filter(x=>x.st.routed),ov=routed.filter(x=>x.st.override).length;
+  return `<div class="grid">${queue()}<div class="stack" style="min-width:0">${triageCard(t)}${decision(t)}${resolution(t)}
+  <section class="panel"><h2>Audit trail</h2><div class="small muted" style="margin-bottom:6px">Decisions this session: ${routed.length}. Overrides: ${ov}. Review time is logged so approvals do not become rubber stamps.</div><ul class="log">${S.audit.length?S.audit.map(a=>`<li>${esc(a)}</li>`).join(''):'<li>No decisions yet.</li>'}</ul></section></div></div>`;
+}
+function controlView(){
+  const rows=Object.entries(cfg.categories).map(([k,c])=>`<tr><td><b>${esc(c.label)}</b></td><td>${esc(c.owner)}</td><td><span class="sev ${c.floor_market}">${c.floor_market}</span> / <span class="sev ${c.floor_off}">${c.floor_off}</span></td><td><select data-level="${k}" aria-label="Level for ${esc(c.label)}" ${c.held_reason?'disabled':''}>${['L0','L1','L2'].map(l=>`<option value="${l}" ${c.level===l?'selected':''}>${l} ${LEVEL[l]}</option>`).join('')}<option disabled>L3 Limited auto (not earned)</option></select>${c.held_reason?'<div class="small muted">Held at L1 until Gate 3 evidence exists.</div>':''}</td></tr>`).join('');
+  return `<div class="stack"><section class="panel"><h2>Automation is a setting, one category at a time</h2><p class="muted" style="margin-top:0">Change a level, then go back to the queue: the same ticket now behaves differently, with no code change. L3 stays locked because no category has earned it.</p><div class="tw"><table><thead><tr><th>Category</th><th>Owning team</th><th>Floor: market / off hours</th><th>Automation level</th></tr></thead><tbody>${rows}</tbody></table></div>
+  <div class="row" style="margin-top:12px"><label for="thr">Confidence threshold for senior review</label><input id="thr" type="range" min="0.3" max="0.9" step="0.05" value="${cfg.confidence_threshold}"><b id="thrv">${pc(cfg.confidence_threshold)}</b></div></section>
+  <section class="panel"><h2>Reuse test: market data feed delay alerts (paper only)</h2><p style="margin-top:0">This harder category is specified as configuration and is not run. Machine alerts skip the classifier; the floors, ladder, approval gates and audit trail carry over unchanged.</p><p><b>What the paper test found:</b> clustering must become a per-category strategy, because alerts group by feed and venue while client reports group by text. Blast radius needs entitled-client counts as well as report counts. These are small engine changes, so the design passes with two named conditions.</p><pre>${esc(JSON.stringify(PAPER,null,2))}</pre></section></div>`;
+}
+function evidenceView(){
+  const R=HOLD,tr=R.severity.table;
+  return `<div class="stack"><section class="panel"><h2>Held-out test: ${R.n} hand-written synthetic reports, run once on frozen settings</h2><div class="tiles">
+  <div class="tile"><b>${R.category.accuracy}%</b>Category accuracy (keyword rules: ${R.category.baselineAccuracy}%)</div>
+  <div class="tile"><b>${tr[0].criticalRecall}%</b>Critical issues escalated (model alone: ${tr[1].criticalRecall}%)</div>
+  <div class="tile"><b>${R.severity.underS1S2.length}</b>Critical issues under-triaged in strict terms</div>
+  <div class="tile"><b>${R.rootCause.top3}%</b>True cause in top 3 (target 70%)</div>
+  <div class="tile"><b>${R.calibration.ece}</b>Calibration error (lower is better)</div></div></section>
+  <section class="panel"><h2>The control layer is what earns the money</h2><div class="tw"><table><thead><tr><th>Approach</th><th>Critical escalated</th><th>Minor over-escalated</th><th>Net USD per issue at 1% / 5% / 10% critical</th></tr></thead><tbody>${tr.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.criticalRecall}%</td><td>${x.falseEscalationRate}%</td><td>${[.01,.05,.1].map(p=>x.netPayoffPerIssue[p]).join(' / ')}</td></tr>`).join('')}</tbody></table></div><p class="small muted">Payoffs are the proposal's assumed values, and critical shares are assumptions.</p></section>
+  <section class="panel"><h2>Where it failed</h2><div class="tw"><table><thead><tr><th>Report</th><th>Truth</th><th>System</th></tr></thead><tbody>${R.severity.underS1S2.map(u=>`<tr><td>${esc(u.text)}</td><td><span class="sev ${u.truth}">${u.truth}</span></td><td><span class="sev ${u.got}">${u.got}</span></td></tr>`).join('')}</tbody></table></div>
+  <p>Understated language is the dangerous case. Gate 1 is therefore <span class="part">partly met</span>: time to triage cannot be measured without real users, and “near zero” under-triage was missed.</p><p class="small muted">Limits: one author wrote the data and the tests, so these results are likely optimistic, and they say nothing about real tickets.</p></section></div>`;
+}
+function render(){nav();const v=document.getElementById('view');v.innerHTML=S.tab==='queue'?queueView():S.tab==='control'?controlView():evidenceView()}
+function refresh(){recompute();render()}
+function routeNow(t,owner,sev,why){
+  const before=t.sev,changed=owner!==t.triage.owner||sev!==before;
+  const secs=t.st.opened?Math.round((Date.now()-t.st.opened)/1000):0;
+  t.st.routed=true;t.st.owner=owner;t.st.override=changed?why:null;
+  if(sev!==before){t.triage.trail=t.triage.trail;t.humanSev=sev}
+  log(`${t.id} routed to ${owner}, priority ${sev}${changed?' (OVERRIDE: '+why+')':''}, review ${secs}s, level ${t.triage.level}`);
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const t=cur();
+  if(b.dataset.tab){S.tab=b.dataset.tab;render();return}
+  if(b.dataset.t){S.sel=b.dataset.t;render();return}
+  if(b.id==='merge'){t.peers.forEach(id=>{S.tickets.find(x=>x.id===id).st.merge=true});log(`${t.peers.join(', ')} merged by engineer`);render();return}
+  if(b.id==='route'){
+    const owner=document.getElementById('owner').value,sev=document.getElementById('sev').value,why=document.getElementById('why').value.trim(),err=document.getElementById('err');
+    const changed=owner!==t.triage.owner||sev!==t.sev;
+    if(!owner){err.hidden=false;err.textContent='Choose an owner first.';return}
+    if(changed&&!why&&t.triage.level!=='L0'){err.hidden=false;err.textContent='Add a reason, so the override can be learned from.';return}
+    routeNow(t,owner,sev,why);if(sev!==t.sev){t.sev=sev}render();return}
+  if(b.dataset.cause!==undefined){t.st.cause=+b.dataset.cause;log(`${t.id} cause confirmed by engineer`);render();return}
+  if(b.id==='fix'){t.st.fix=true;log(`${t.id} fix approved; engineer runs it through change process`);render();return}
+  if(b.id==='send'){t.st.approved=true;t.st.sent=true;log(`${t.id} client update approved and sent (simulated)`);render();return}
+  if(b.id==='close'){t.st.closed=true;log(`${t.id} closed by engineer`);render();return}
+  if(b.id==='add'){const v=document.getElementById('newt').value.trim();if(!v)return;const last=S.tickets.reduce((a,x)=>Math.max(a,x.minute),0)+1;const id='T-'+S.n++;
+    S.tickets.push({id,text:v,client:'Your test report',channel:'Console',time:'now',minute:last,st:{opened:null,routed:false,owner:null,override:null,merge:false,cause:null,steps:{},fix:false,next:'',approved:false,sent:false,closed:false}});S.sel=id;refresh();return}
+});
+document.addEventListener('change',e=>{
+  const el=e.target,t=cur();
+  if(el.id==='mh'){refresh();return}
+  if(el.dataset.level){cfg.categories[el.dataset.level].level=el.value;log(`Level for ${cfg.categories[el.dataset.level].label} set to ${el.value}`);refresh();return}
+  if(el.dataset.step!==undefined){t.st.steps[el.dataset.step]=el.checked;return}
+  if(el.id==='next'){t.st.next=el.value;render();return}
+});
+document.addEventListener('input',e=>{if(e.target.id==='thr'){cfg.confidence_threshold=+e.target.value;document.getElementById('thrv').textContent=pc(cfg.confidence_threshold);recompute()}});
+// Named views: #queue, #control, #evidence, or a ticket such as #T-1005. #walk-T-1001 replays a finished case for the screenshots.
+function fromHash(){
+  const h=location.hash.slice(1);
+  if(h==='control'||h==='evidence'||h==='queue'){S.tab=h}
+  else if(/^T-\d+$/.test(h)&&S.tickets.some(x=>x.id===h)){S.sel=h}
+  else if(h.startsWith('walk-')){const id=h.slice(5),t=S.tickets.find(x=>x.id===id);if(t){S.sel=id;routeNow(t,t.triage.owner,t.sev,'');t.st.cause=0;t.st.fix=true;t.st.next='10:30';t.st.approved=true;t.st.sent=true;log(`${id} cause confirmed, fix approved, update approved (replayed)`)}}
+}
+recompute();fromHash();render();addEventListener('hashchange',()=>{fromHash();render()});
+</script>
+</body></html>

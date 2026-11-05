@@ -1,0 +1,12 @@
+T-1001|1|09:52|Meridian Capital|Portal|My orders are stuck, nothing moving, I cannot cancel and the market is falling
+T-1002|1|09:53|Northgate Securities|Email|pending on all orders since 9:50, no acknowledgement on any of them. Urgent.
+T-1003|1|09:55|Asha Fund Managers|Chat|Everything sits in queue. Can't cancel, can't send.
+T-1004|1|09:56|Kestrel Partners|Portal|Order screen hanging, all tickets waiting on ack
+T-1005|1|10:04|Lotus Wealth|Chat|Quick question, nothing major - my IOC partly filled and the rest disappeared?
+T-1006|1|10:20|Harbour Trading|Email|Credit limit reject on an order, our risk team raised the limit last week
+T-1007|1|10:31|Orchid Advisors|Portal|How do I change my default order quantity on the terminal?
+T-1008|1|10:44|Zenith Dealers|Chat|Portal says 500 filled but the venue confirm says 450
+T-1009|1|11:02|Vega Markets|Email|Someone logged in to my account from an unknown location and I did not authorise it
+T-1010|1|11:15|Saffron Capital|Chat|Hello team, just wondering about an order from a while ago, no update so far
+T-1011|1|11:40|Delta Brokers|Portal|Logon refused, sequence number too low, our FIX session is down
+T-1012|1|12:05|Indigo Funds|Email|Getting error 2047 when I enter

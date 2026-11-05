@@ -1,0 +1,4 @@
+DEP-881|oms|-30|OMS 7.3 outbound queue configuration change|oms_queue_backlog
+DEP-882|risk|110|Limit file loader patch|risk_limit_config
+DEP-883|router|60|Smart order router release 4.2|router_fault
+DEP-884|dropcopy|225|Drop copy consumer upgrade|dropcopy_gap

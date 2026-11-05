@@ -1,0 +1,18 @@
+{
+  "version": "1.0-mvp",
+  "severity_scale": ["S4", "S3", "S2", "S1"],
+  "confidence_threshold": 0.55,
+  "uncertain_alternative_probability": 0.2,
+  "cluster": { "similarity_threshold": 0.3, "window_minutes": 30 },
+  "blast_radius": [ { "min_reports": 3, "floor": "S2" }, { "min_reports": 4, "floor": "S1", "market_hours_only": true } ],
+  "security_rule": { "floor": "S2", "route": "Senior Engineer + Security", "terms": ["unauthorised","unauthorized","authorise","authorize","suspicious","compromise","unknown location","credential","fraud"] },
+  "never_allowed": ["downgrade_severity","close_issue","merge_issue","production_deploy_or_rollback","send_unapproved_update","state_uncited_cause"],
+  "categories": {
+    "order_rejected":       { "label": "Order rejected",           "owner": "Order Gateway Support",  "level": "L2", "floor_market": "S3", "floor_off": "S4", "always_senior": false },
+    "order_stuck":          { "label": "Order stuck / no ack",     "owner": "Order Management (OMS)", "level": "L2", "floor_market": "S2", "floor_off": "S3", "always_senior": false },
+    "execution_failed":     { "label": "Execution failed",         "owner": "Execution Engineering",  "level": "L1", "floor_market": "S2", "floor_off": "S3", "always_senior": true, "held_reason": "Held at L1 on purpose: a miss in this category costs the most." },
+    "fill_mismatch":        { "label": "Fill / position mismatch", "owner": "Post-Trade Engineering", "level": "L2", "floor_market": "S3", "floor_off": "S4", "always_senior": false },
+    "session_connectivity": { "label": "Session / connectivity",   "owner": "Connectivity Support",   "level": "L2", "floor_market": "S2", "floor_off": "S3", "always_senior": false },
+    "access_howto":         { "label": "Access / how-to",          "owner": "Client Service Desk",    "level": "L2", "floor_market": "S4", "floor_off": "S4", "always_senior": false }
+  }
+}
