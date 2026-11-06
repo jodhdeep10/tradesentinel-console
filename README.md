@@ -1,53 +1,43 @@
-# TradeSentinel Console
+# TradeSentinel
 
-Working prototype of TradeSentinel, an AI-assisted triage console for the support team of a trading platform. Built for the Management of AI Products capstone (MBA ZG583).
+**An AI review copilot for a trading platform's support desk.** It reads client reports, proposes category, priority and owner, groups duplicates, ranks likely causes with evidence and drafts client replies, while fixed rules decide what is allowed and people make every decision that matters.
 
-- **Live demo:** [jodhdeep10.github.io/tradesentinel-console](https://jodhdeep10.github.io/tradesentinel-console/)
-- **Source code:** [github.com/jodhdeep10/tradesentinel-console](https://github.com/jodhdeep10/tradesentinel-console)
+*Capstone for MBA ZG583 Management of AI Products · Team013 (Individual) · Jodhdeep Singh · 2025mb26112 · MBA – AI in Business · BITS Pilani WILP · November 2026*
 
-All clients, tickets, incidents and releases are invented. Nothing connects to a live system, and a local classifier stands in for the pilot's API language model.
+- **Live prototype:** [jodhdeep10.github.io/tradesentinel-console](https://jodhdeep10.github.io/tradesentinel-console/)
+- **Read the documentation:** [Documentation](Documentation/README.md), one page per topic in the order of the course packet
+- **Recommendation:** pilot in shadow mode only; do not scale yet ([why](<Documentation/10.Recommendation/10.1 Decision Requested.md>))
 
-## What it shows
+## Submission Deliverables
 
-The AI reads and matches, rules set the limits, and a person makes the decisions that matter.
+Each document is provided as a PDF (the formal submission) and as Markdown (for reading on GitHub).
 
-- The home board splits issues by who must act next: with your team, or with the client
-- Unclear, failed-trade, security and critical issues are flagged for a subject matter expert (SME) to check
-- Suggested fixes are assigned to the development team, who apply them through the normal change process
-- The suggested client reply can be edited before it is sent
-- Reports are classified, with confidence and alternatives shown
-- Likely duplicates are grouped, and a person confirms any merge
-- Severity can only go up, and every step is explained
-- Automation is set per category: L0 shadow, L1 suggest, L2 assisted
-- Causes are ranked with citations to past incidents and releases
-- A client update cannot be sent while it has blanks or lacks approval
+| # | Deliverable | PDF | Markdown |
+|---|---|---|---|
+| 01 | Executive Summary | [PDF](01_Executive_Summary.pdf) | [Markdown](01_Executive_Summary.md) |
+| 02 | Final Report | [PDF](02_Final_Report.pdf) | [Markdown](02_Final_Report.md) |
+| 03 | Presentation Deck | [PDF](03_Presentation_Deck.pdf) | [Slide text and notes](03_Presentation_Deck.md) |
+| 04 | Prototype README and Link | | [Markdown](04_Prototype_Readme_or_Link.md) |
+| 05 | AI Collaboration Log | | [Markdown](05_AI_Collaboration_Log.md) |
+| 06 | Individual Contribution Statement | [PDF](06_Individual_Contribution_Statement.pdf) | [Markdown](06_Individual_Contribution_Statement.md) |
 
-## Run it locally
+**Appendix**
 
-Open `index.html` in a browser. It needs no server, install or API key.
+| Document | PDF | Markdown |
+|---|---|---|
+| PRD | [PDF](Appendix/PRD/PRD.pdf) | [Markdown](Appendix/PRD/PRD.md) |
+| Wireframes | [PDF](Appendix/Wireframes/Wireframes.pdf) | [Markdown](Appendix/Wireframes/Wireframes.md) |
+| Metrics and Evaluation | [PDF](Appendix/Metrics/Metrics_and_Evaluation.pdf) | [Markdown](Appendix/Metrics/Metrics_and_Evaluation.md) |
+| Roadmap | [PDF](Appendix/Roadmap/Roadmap.pdf) | [Markdown](Appendix/Roadmap/Roadmap.md) |
+| Risk Note | [PDF](Appendix/Risk_Note/Risk_Note.pdf) | [Markdown](Appendix/Risk_Note/Risk_Note.md) |
+| Screenshots | [Folder](Appendix/Screenshots_or_Video) | |
 
-## Repeat the evaluation
+## Repository Layout
 
-Requires Node.js. No packages are needed.
-
-```bash
-node evaluate.js holdout
-```
-
-Results are written to `data/eval_results_holdout.json`. After changing data or code, rebuild the page with `node build.js`.
-
-## Limits
-
-One author wrote the training data, test data and incident catalog, so results are likely optimistic and say nothing about real tickets. In the held-out test, three critical issues were under-triaged. See the Evaluation evidence tab.
-
-## Files
-
-| File | Purpose |
+| Folder | Contents |
 |---|---|
-| `index.html` | The demo, built into one file |
-| `app.template.html` | Interface source |
-| `engine.js` | Classifier, control logic, clustering, cause ranking, drafting |
-| `evaluate.js` | Evaluation harness |
-| `data/control_config.json` | Floors, levels and rules (the control layer) |
-| `data/market_data_feed_delay.config.json` | Reuse test for a second category (paper only, not run) |
-| `data/` (other files) | Synthetic reports and catalogs |
+| `Documentation/` | The report split into one page per topic: strategy, PM artifacts, UX and trust, data and evaluation, economics, risk, prototype, AI collaboration, recommendation |
+| `Prototype/` | The working console (`index.html`), its decision engine, synthetic data and evaluation harness ([README](Prototype/README.md)) |
+| `Appendix/` | PRD, wireframes, metrics, roadmap, risk note, figures and screenshots |
+
+All clients, tickets, incidents and releases in this project are invented. Nothing connects to a live system.
