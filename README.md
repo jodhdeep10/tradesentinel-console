@@ -10,6 +10,7 @@ All clients, tickets, incidents and releases are invented. Nothing connects to a
 
 The AI reads and matches, rules set the limits, and a person makes the decisions that matter.
 
+- The home board splits issues by who must act next: with your team, or with the client
 - Reports are classified, with confidence and alternatives shown
 - Likely duplicates are grouped, and a person confirms any merge
 - Severity can only go up, and every step is explained
