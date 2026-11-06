@@ -194,5 +194,5 @@
     "hypothesesAlwaysCiteEvidence": true,
     "unapprovedCannotSend": true
   },
-  "latencyMsPerTriage": 0.02
+  "latencyMsPerTriage": 0.01
 }

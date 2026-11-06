@@ -2,7 +2,8 @@
 
 Working prototype of TradeSentinel, an AI-assisted triage console for the support team of a trading platform. Built for the Management of AI Products capstone (MBA ZG583).
 
-**Live demo:** https://jodhdeep10.github.io/tradesentinel-console/
+- **Live demo:** [jodhdeep10.github.io/tradesentinel-console](https://jodhdeep10.github.io/tradesentinel-console/)
+- **Source code:** [github.com/jodhdeep10/tradesentinel-console](https://github.com/jodhdeep10/tradesentinel-console)
 
 All clients, tickets, incidents and releases are invented. Nothing connects to a live system, and a local classifier stands in for the pilot's API language model.
 
@@ -11,6 +12,9 @@ All clients, tickets, incidents and releases are invented. Nothing connects to a
 The AI reads and matches, rules set the limits, and a person makes the decisions that matter.
 
 - The home board splits issues by who must act next: with your team, or with the client
+- Unclear, failed-trade, security and critical issues are flagged for a subject matter expert (SME) to check
+- Suggested fixes are assigned to the development team, who apply them through the normal change process
+- The suggested client reply can be edited before it is sent
 - Reports are classified, with confidence and alternatives shown
 - Likely duplicates are grouped, and a person confirms any merge
 - Severity can only go up, and every step is explained

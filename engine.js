@@ -167,10 +167,11 @@
 
     // Statements are only allowed with a citation. A missing cause stays a visible placeholder.
     function draftUpdate({ reports, severity, category, confirmed, startedAt, approved }) {
-      const label = config.categories[category].label;
-      const cause = confirmed ? `Cause identified: ${confirmed.summary} [${confirmed.evidence[0].id}]` : '[CAUSE NOT CONFIRMED: engineer must select evidence before this can be sent]';
-      const impact = reports > 1 ? `${reports} client reports are linked to this incident.` : 'One client report is linked to this incident.';
-      const text = `We are investigating an issue first reported at ${startedAt} (type: ${label}). Priority: ${severity}. ${impact} ${cause} [NEXT UPDATE TIME: engineer to set]`;
+      const label = config.categories[category].label.toLowerCase();
+      const names = { S1: 'critical', S2: 'high', S3: 'medium', S4: 'low' };
+      const cause = confirmed ? `We have found the cause: ${confirmed.summary.replace(/\.$/, '')} (reference ${confirmed.evidence[0].id}).` : '[CAUSE NOT CONFIRMED: pick a cause in step 2]';
+      const impact = reports > 1 ? `${reports} clients have reported the same problem, and we are handling it as one incident.` : '';
+      const text = `Thank you for letting us know. We are working on the problem you reported at ${startedAt} (${label}), and we have given it ${names[severity] || severity} priority. ${impact} ${cause} [NEXT UPDATE TIME: set it below]`.replace(/\s+/g, ' ');
       const placeholders = (text.match(/\[[A-Z ]+[:][^\]]*\]/g) || []);
       return { text, placeholders, canSend: !!approved && placeholders.length === 0 };
     }
