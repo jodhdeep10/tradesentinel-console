@@ -12,5 +12,5 @@
   "blast_radius": [ { "min_clients_entitled": 20, "floor": "S1", "market_hours_only": true } ],
   "severity_inputs": { "lag_ms_floor": [ { "min_lag_ms": 1000, "floor": "S3" }, { "min_lag_ms": 5000, "floor": "S2" } ] },
   "runbook": ["Confirm lag at the feed handler","Compare primary and secondary feeds","Request approval to fail over","Tell entitled clients once the cause is cited"],
-  "client_update": { "audience": "all_entitled_clients", "approval": "senior_engineer" }
+  "client_update": { "audience": "all_entitled_clients", "approval": "sme" }
 }
