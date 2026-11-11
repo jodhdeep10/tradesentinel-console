@@ -16,7 +16,7 @@ Likelihood and impact are the author’s judgement before pilot data exists, on 
 | R6 | Gaming with “urgent” language | Medium | Low | Floors do not depend on such words; monitor by client | Unusual pattern by client | Support lead |
 | R7 | Rubber-stamp approvals | High | High | L1 without pre-fill; review time tracking; sampling; seeded errors | Review time falls, errors do not | Support lead |
 | R8 | Drift in volatile markets | High | Medium | Rule floors do not drift; monitor by market regime | Metric drop in stress periods | Product |
-| R9 | Overload of SMEs | Medium | Medium | Track SME queue; tune the threshold with evidence | 34.3% sent to SME check in test | Operations |
+| R9 | Overload of SMEs | Medium | Medium | Agreed ceiling on the share sent to SMEs; track the SME queue; tune the threshold with evidence | 34.3% sent to SME check in test | Operations |
 | R10 | Skill erosion among engineers | Medium | Medium | Rotations without AI; drills | Drill results | Support lead |
 | R11 | API outage during market stress | Medium | High | Manual fallback; rules run locally | Timeouts | Engineering |
 | R12 | Unclear accountability for errors | Medium | High | Written policy: decisions and system limits have named owners; blameless review | Any disputed incident | Risk |

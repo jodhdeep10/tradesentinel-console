@@ -190,7 +190,7 @@ The full PRD, roadmap, metrics and risk documents are in the Appendix. This sect
 | Business | SLA breaches on S1/S2 issues | Not tracked | Falling | Lagging |
 | Trust | Critical issues under-triaged | 3 of 41 | Near zero | Guardrail |
 | Trust | Override rate and median review time | Not measured | Stable; falling review time with steady errors means rubber-stamping | Guardrail |
-| Trust | Share sent to SME check | 34.3% (synthetic) | Sustainable for the SME team | Guardrail |
+| Trust | Share sent to SME check | 34.3% (synthetic) | Within a ceiling agreed with the SME team, reviewed at each gate | Guardrail |
 
 *Metric definitions and full results: Appendix/Metrics.*
 
@@ -402,7 +402,7 @@ Very short messages can also score high confidence on little evidence: “Gettin
 |---|---|---|
 | Gate 1: Synthetic | Targets met on synthetic data: root cause at least 70%; under-triage near zero; time under 3 minutes in a user trial | **Partly met.** Root cause met. Under-triage not met. Time not yet measured. |
 | Gate 2: Shadow | 8 weeks on real tickets: category agreement within 5 points of expert-to-expert agreement; no S1 issue called below S2; no critical issue below the escalation line, including replayed past incidents | Not started |
-| Gate 3: Live assist | Positive net payoff against current practice; calibration error below 0.05; stable review time and override rate; operations and risk sign-off | Not started |
+| Gate 3: Live assist | Positive net payoff against current practice; calibration error below 0.05; stable review time and override rate; SME share within the agreed ceiling; operations and risk sign-off | Not started |
 
 **Sample size matters.** Zero misses in n cases only shows a true miss rate below about 3/n, so about 300 critical cases are needed to claim under 1%. Live shadow volume alone will not provide that in eight weeks, so Gate 2 also replays historical critical incidents.
 
@@ -412,7 +412,7 @@ All amounts here are illustrative assumptions, set out so that they can be chall
 
 ### 6.1 Monetization Model and Value Logic
 
-**Internal value case.** TradeSentinel is funded as an operating and risk investment, not sold. External licensing is out of scope until reuse is proven; our control logic depends on one firm’s SLAs and may not transfer directly.
+**Internal now, SaaS later.** For the pilot, TradeSentinel is funded internally as an operating and risk investment. If the reuse test passes in practice (Phase 3), the control layer and evaluation tooling could be offered to other brokers’ support desks as a subscription, priced per desk. Selling it is not part of this request: our control logic depends on one firm’s SLAs, so an external offer needs proven reuse, configuration that other firms can set themselves, and its own business case.
 
 - **Time:** faster triage and resolution, and fewer duplicate tickets worked separately.
 - **Risk:** fewer critical issues missed or under-called, the largest and least certain value.
@@ -420,7 +420,7 @@ All amounts here are illustrative assumptions, set out so that they can be chall
 
 ### 6.2 The Economics of Being Wrong
 
-Escalating is the better decision whenever the chance that an issue is critical exceeds the break-even share below. The conclusion survives large changes in the inputs: the break-even stays low, so the design should continue to lean towards escalation.
+Escalating is the better decision whenever the chance that an issue is critical exceeds the break-even share below. The conclusion survives large changes in the inputs: the break-even stays low, so the design should continue to lean towards escalation. That has a limit: the share of issues sent to SMEs must stay within a ceiling agreed with the SME team, because an overloaded SME stops checking carefully. If the ceiling is breached, the confidence threshold is reviewed with evidence; severity floors are never lowered to relieve load.
 
 | Scenario | False escalation (USD) | Missed critical (USD) | Break-even critical share |
 |---|---|---|---|

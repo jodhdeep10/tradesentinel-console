@@ -9,7 +9,7 @@ I worked as the product manager and used an AI assistant to build and draft. The
 ## Tools Used
 
 - **Claude Code (Claude Opus 5.5), in the Claude desktop app:** prototype code, synthetic data, evaluation harness, first drafts of the documents and deck, and the GitHub Pages set-up.
-- **[Other tools, including any AI used for the October proposal, or "None"]**
+- **Microsoft Copilot:** light help with wording and polish on my October proposal. The content and the decisions in it were mine.
 
 ## Where AI Helped
 
@@ -89,9 +89,9 @@ These are prompts I actually gave, lightly corrected for spelling.
 | Decision | My position |
 |---|---|
 | Opportunity choice | TradeSentinel on the order-entry and execution flow, chosen in my proposal |
-| Risk acceptance | Under-triage is the unacceptable risk; false escalations are accepted as the price of safety |
+| Risk acceptance | Missing a critical issue is unacceptable; needless escalations are accepted up to a ceiling that protects SME capacity |
 | Launch recommendation | Pilot in shadow mode only; do not scale until Gate 2 |
-| Monetization judgment | Internal value case; no external sale until reuse is proven |
+| Monetization judgment | Internal funding for the pilot; a SaaS offer for other brokers' support desks only if the reuse test is passed |
 | Governance claims | Controls and launch blockers as stated; no legal or regulatory claim without compliance review |
 
 ## Final Reflection

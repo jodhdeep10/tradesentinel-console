@@ -23,8 +23,8 @@ This roadmap is about staged learning. Each phase exists to answer a question, a
 |---|---|---|
 | Gate 1 | New held-out set: no critical issue below the escalation line; cause in top three at least 70%. Timed trial: under 3 minutes median to first correct triage | Fix and repeat once. If it fails again, return to the design or stop |
 | Gate 2 | Category agreement within 5 points of expert-to-expert agreement; no S1 called below S2; no critical issue below the escalation line, including replay; no material fairness gap; masking verified | Stay in shadow. Two consecutive failures: stop or limit to search support |
-| Gate 3 | Positive net payoff against current practice; ECE below 0.05; stable override and review time; operations and risk sign-off | Stay at L1 as an assist feature |
-| Reuse decision | Second category live with only small pluggable strategies added | Stay a single-flow feature, not a platform |
+| Gate 3 | Positive net payoff against current practice; ECE below 0.05; stable override and review time; SME share within the agreed ceiling; operations and risk sign-off | Stay at L1 as an assist feature |
+| Reuse decision | Second category live with only small pluggable strategies added; if passed, prepare the business case for a SaaS offer | Stay a single-flow feature, not a platform or product |
 
 ## Ladder Rules
 

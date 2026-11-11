@@ -13,8 +13,6 @@ Working web application in one HTML file. It runs in the browser with no server,
 - **Repository:** https://github.com/jodhdeep10/tradesentinel-console
 - **Documentation:** [Documentation/README.md](Documentation/README.md)
 - **Screenshots:** [Appendix/Screenshots_or_Video/](Appendix/Screenshots_or_Video/)
-- **Video:** [add a link if you record a walkthrough]
-
 ## What It Demonstrates
 
 The full decision loop for one flow (order-entry and execution issues, one client tier, one venue):

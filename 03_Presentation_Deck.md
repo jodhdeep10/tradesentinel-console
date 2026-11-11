@@ -196,7 +196,7 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - 1 miss
 - avoided about every 2.8 months covers the conservative shortfall of USD 19,765 a month
 - Break-even at about 403 issues a month in the base case. A very small desk may not need this.
-- Internal value case with no external sale. All amounts are illustrative assumptions.
+- Funded internally for the pilot; a SaaS offer to other brokers only if reuse is proven. All amounts are illustrative assumptions.
 
 > **Speaker notes:** Honest economics. Inference is about five cents. False escalations eat most of the time savings. In the conservative case the product loses money on time alone, but a single avoided miss every few months covers the gap. So risk reduction is the claim that the pilot has to test. All values are assumptions.
 
