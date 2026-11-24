@@ -90,10 +90,10 @@
         "criticalRecall": 100,
         "missed": [],
         "falseEscalationRate": 40,
-        "netPayoffPerIssue": {
-          "0.01": 14,
-          "0.05": 216,
-          "0.1": 468
+        "netHoursPerIssue": {
+          "0.01": 0.1,
+          "0.05": 3.3,
+          "0.1": 7.4
         }
       },
       {
@@ -103,10 +103,10 @@
           "D11"
         ],
         "falseEscalationRate": 30,
-        "netPayoffPerIssue": {
-          "0.01": -22,
-          "0.05": -41,
-          "0.1": -65
+        "netHoursPerIssue": {
+          "0.01": -0.5,
+          "0.05": -0.8,
+          "0.1": -1.2
         }
       },
       {
@@ -118,10 +118,10 @@
           "D20"
         ],
         "falseEscalationRate": 10,
-        "netPayoffPerIssue": {
-          "0.01": -94,
-          "0.05": -555,
-          "0.1": -1131
+        "netHoursPerIssue": {
+          "0.01": -1.6,
+          "0.05": -9,
+          "0.1": -18.2
         }
       },
       {
@@ -129,10 +129,10 @@
         "criticalRecall": 100,
         "missed": [],
         "falseEscalationRate": 100,
-        "netPayoffPerIssue": {
-          "0.01": -98,
-          "0.05": 108,
-          "0.1": 365
+        "netHoursPerIssue": {
+          "0.01": -1.7,
+          "0.05": 1.6,
+          "0.1": 5.8
         }
       },
       {
@@ -151,10 +151,10 @@
           "D20"
         ],
         "falseEscalationRate": 0,
-        "netPayoffPerIssue": {
-          "0.01": -460,
-          "0.05": -2462,
-          "0.1": -4964
+        "netHoursPerIssue": {
+          "0.01": -7.5,
+          "0.05": -39.5,
+          "0.1": -79.5
         }
       }
     ],

@@ -49,7 +49,7 @@ The capstone documents, one page per topic, in the order of the course packet. T
 
 - [6.1 Monetization Model and Value Logic](06.Business%2C%20Economics%20%26%20Scaling/6.1%20Monetization%20Model%20and%20Value%20Logic.md)
 - [6.2 The Economics of Being Wrong](06.Business%2C%20Economics%20%26%20Scaling/6.2%20The%20Economics%20of%20Being%20Wrong.md)
-- [6.3 Cost Drivers](06.Business%2C%20Economics%20%26%20Scaling/6.3%20Cost%20Drivers.md)
+- [6.3 Effort Drivers](06.Business%2C%20Economics%20%26%20Scaling/6.3%20Effort%20Drivers.md)
 - [6.4 Unit Economics](06.Business%2C%20Economics%20%26%20Scaling/6.4%20Unit%20Economics.md)
 - [6.5 Scaling Risks and Operational Implications](06.Business%2C%20Economics%20%26%20Scaling/6.5%20Scaling%20Risks%20and%20Operational%20Implications.md)
 

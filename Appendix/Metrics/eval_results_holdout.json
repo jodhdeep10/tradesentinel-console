@@ -92,10 +92,10 @@
           "H68"
         ],
         "falseEscalationRate": 13.8,
-        "netPayoffPerIssue": {
-          "0.01": 50,
-          "0.05": 196,
-          "0.1": 378
+        "netHoursPerIssue": {
+          "0.01": 0.7,
+          "0.05": 3,
+          "0.1": 5.9
         }
       },
       {
@@ -111,10 +111,10 @@
           "H69"
         ],
         "falseEscalationRate": 10.3,
-        "netPayoffPerIssue": {
-          "0.01": -24,
-          "0.05": -200,
-          "0.1": -421
+        "netHoursPerIssue": {
+          "0.01": -0.5,
+          "0.05": -3.3,
+          "0.1": -6.9
         }
       },
       {
@@ -146,10 +146,10 @@
           "H69"
         ],
         "falseEscalationRate": 10.3,
-        "netPayoffPerIssue": {
-          "0.01": -238,
-          "0.05": -1273,
-          "0.1": -2567
+        "netHoursPerIssue": {
+          "0.01": -3.9,
+          "0.05": -20.5,
+          "0.1": -41.2
         }
       },
       {
@@ -157,10 +157,10 @@
         "criticalRecall": 100,
         "missed": [],
         "falseEscalationRate": 100,
-        "netPayoffPerIssue": {
-          "0.01": -98,
-          "0.05": 108,
-          "0.1": 365
+        "netHoursPerIssue": {
+          "0.01": -1.7,
+          "0.05": 1.6,
+          "0.1": 5.8
         }
       },
       {
@@ -210,10 +210,10 @@
           "H69"
         ],
         "falseEscalationRate": 0,
-        "netPayoffPerIssue": {
-          "0.01": -460,
-          "0.05": -2462,
-          "0.1": -4964
+        "netHoursPerIssue": {
+          "0.01": -7.5,
+          "0.05": -39.5,
+          "0.1": -79.5
         }
       }
     ],
@@ -290,5 +290,5 @@
     "hypothesesAlwaysCiteEvidence": true,
     "unapprovedCannotSend": true
   },
-  "latencyMsPerTriage": 0.02
+  "latencyMsPerTriage": 0.01
 }

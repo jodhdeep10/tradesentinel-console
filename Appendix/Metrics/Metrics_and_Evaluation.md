@@ -16,7 +16,7 @@ Results below come from *Prototype/data/eval_results_holdout.json* (70 synthetic
 | Top-3 cause hit | Final cause appears in the top three hypotheses | Closure records | Assistant value |
 | Override rate | Decisions changed by a person, per category | Audit log | Trust; Gate 2 and 3 |
 | Median review time | Open to approve, per decision | Audit log | Rubber-stamp detection |
-| Net payoff per issue | Share of each outcome times its payoff | Labels and finance | Gate 3 |
+| Net effort saved per issue | Share of each outcome times its hours of effort | Labels and time records | Gate 3 |
 
 ## 2. Category Results by Class
 
@@ -42,17 +42,17 @@ Overall 90%; macro F1 0.899; correct in top two 95.7%. Keyword baseline: 45.7%; 
 
 ECE is 0.083. On this small sample the model tends to under-state its confidence, which is the safer direction. However, the two errors that passed unreviewed had 71% and 82% confidence, so confidence alone is not an adequate safety signal. This is why floors exist. The Gate 3 threshold is 0.05.
 
-## 4. Severity Decisions and Payoff
+## 4. Severity Decisions and Effort
 
-| Approach | Critical escalated | Missed | False escalation | USD per issue at 1% critical | at 5% | at 10% |
+| Approach | Critical escalated | Missed | False escalation | Hours per issue at 1% critical | at 5% | at 10% |
 |---|---|---|---|---|---|---|
-| TradeSentinel (floors + blast radius) | 97.6% | 1 | 13.8% | +50 | +196 | +378 |
-| Model alone, no control layer | 82.9% | 7 | 10.3% | −24 | −200 | −421 |
-| Keyword rules baseline | 43.9% | 23 | 10.3% | −238 | −1,273 | −2,567 |
-| Escalate everything | 100% | 0 | 100% | −98 | +108 | +365 |
-| Escalate nothing | 0% | 41 | 0% | −460 | −2,462 | −4,964 |
+| TradeSentinel (floors + blast radius) | 97.6% | 1 | 13.8% | +0.7 h | +3.0 h | +5.9 h |
+| Model alone, no control layer | 82.9% | 7 | 10.3% | −0.5 h | −3.3 h | −6.9 h |
+| Keyword rules baseline | 43.9% | 23 | 10.3% | −3.9 h | −20.5 h | −41.2 h |
+| Escalate everything | 100% | 0 | 100% | −1.7 h | +1.6 h | +5.8 h |
+| Escalate nothing | 0% | 41 | 0% | −7.5 h | −39.5 h | −79.5 h |
 
-Formula: net payoff = p × (recall × 5,000 + (1 − recall) × (−50,000)) + (1 − p) × (FE × (−150) + (1 − FE) × 40), where p is the critical share and FE the false escalation rate. Critical recall has a 95% interval of 87.4% to 99.6% (Wilson; 40 of 41), so small differences between approaches are not meaningful.
+Formula, in hours of staff effort: net = p × (recall × 80 + (1 − recall) × (−800)) + (1 − p) × (FE × (−2.5) + (1 − FE) × 0.5), where p is the critical share and FE the false escalation rate. Critical recall has a 95% interval of 87.4% to 99.6% (Wilson; 40 of 41), so small differences between approaches are not meaningful.
 
 ## 5. Other Results
 
@@ -70,6 +70,6 @@ Formula: net payoff = p × (recall × 5,000 + (1 − recall) × (−50,000)) + (
 
 - One author wrote the training data, test data and incident catalogue, so shared vocabulary probably flatters results.
 - The 41 critical reports are too few to support a claim of a very low miss rate.
-- The critical share in the test set is artificial, so payoffs are re-weighted to assumed shares.
+- The critical share in the test set is artificial, so effort values are re-weighted to assumed shares.
 - The classifier stands in for a language model, whose errors may differ.
 - The holdout has now been seen; fixes need a new test set.

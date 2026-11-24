@@ -4,7 +4,7 @@
 
 ## 1. Executive Summary
 
-**Problem.** Technical issues reach a trading platform’s support team as free text, usually in the client’s own words. An engineer must work out what is broken, how serious it is and who owns it. Triage takes about 10 to 20 minutes per issue (assumed), the queue grows fastest in volatile markets, and one fault is often opened many times and worked separately. The costs are lopsided: a missed execution fault in market hours can cost far more than many needless escalations.
+**Problem.** Technical issues reach a trading platform’s support team as free text, usually in the client’s own words. An engineer must work out what is broken, how serious it is and who owns it. Triage takes about 10 to 20 minutes per issue (assumed), the queue grows fastest in volatile markets, and one fault is often opened many times and worked separately. The effort is lopsided: a missed execution fault in market hours can take hundreds of hours of incident work to put right, far more than many needless escalations.
 
 **Target user.** L1 and L2 support engineers on the order-entry and execution flow, with a subject matter expert (SME) as the point of escalation and the development team applying fixes. Clients benefit indirectly through faster, more accurate updates.
 
@@ -40,16 +40,16 @@ Each persona below has a different job, and the product has to serve all of them
 
 ### 2.3 Opportunity Framing - Why Now and Why Alternatives Fail
 
-- **Why this problem matters.** The decision repeats on every ticket, its cost is measurable, and the downside is severe. By the proposal’s illustrative payoffs, one missed critical issue costs as much as about 333 needless escalations.
+- **Why this problem matters.** The decision repeats on every ticket, its effort is measurable, and the downside is severe. In hours of staff effort, one missed critical issue costs as much as about 320 needless escalations (Section 6.2).
 - **Why AI may help.** The hard step is reading unstructured language and matching it to past incidents, which language models do well and cheaply. What AI does poorly here is knowing when it is wrong, so hard limits stay in rules.
-- **Why now.** Language models can now read free text through an API at about USD 0.05 per ticket (Section 6), far below the cost of engineer time, which removes the old need for a large labelled dataset before any trial can start. Trading volumes are also more volatile, so the queue spikes exactly when mistakes are most expensive.
+- **Why now.** Language models can now read free text through an API in seconds per ticket, with no staff effort, which removes the old need for a large labelled dataset before any trial can start. Trading volumes are also more volatile, so the queue spikes exactly when mistakes are most expensive.
 
 | Alternative | Why it falls short | Evidence |
 |---|---|---|
 | Keyword rules | Break on reworded and understated reports | Measured: 45.7% category accuracy and 43.9% critical recall on the holdout |
-| AI model with no control layer | Misses critical issues that are worded calmly | Measured: 82.9% critical recall; −200 USD per issue at 5% critical |
-| Escalate everything | Swamps SMEs, and loses money when critical issues are rare | Measured: −98 USD per issue at 1% critical |
-| Hire more engineers | Scales cost, not consistency; quality still depends on who is on shift | Reasoning |
+| AI model with no control layer | Misses critical issues that are worded calmly | Measured: 82.9% critical recall; −3.3 h of effort per issue at 5% critical |
+| Escalate everything | Swamps SMEs, and wastes effort when critical issues are rare | Measured: −1.7 h of effort per issue at 1% critical |
+| Hire more engineers | Scales headcount, not consistency; quality still depends on who is on shift | Reasoning |
 | Dashboards and monitoring | Show machine signals but do not read client language | Reasoning |
 | Better runbooks | Help only after someone has identified the problem correctly | Reasoning |
 | Client-facing chatbot | Does not touch the triage decision that causes the losses | Reasoning |
@@ -107,7 +107,7 @@ RICE ranks the options, but the control layer sits above it: it is a preconditio
 
 | Case | What is similar | What is different | Lesson we applied | What we would do differently |
 |---|---|---|---|---|
-| Netflix (metrics and evaluation) | A model metric only matters if it moves a business outcome | Errors here carry financial and regulatory cost; a poor recommendation does not | Judge decisions by net payoff, not accuracy (Section 5.5) | Weight rare critical errors heavily instead of averaging them away |
+| Netflix (metrics and evaluation) | A model metric only matters if it moves a business outcome | Errors here carry heavy incident effort and regulatory exposure; a poor recommendation does not | Judge decisions by net effort saved, not accuracy (Section 5.5) | Weight rare critical errors heavily instead of averaging them away |
 | Instacart (lifecycle and drift) | Volatile periods change behaviour and can break patterns learned in calm periods | Our data shift arrives within minutes during a market event | Floors do not depend on the model, so they still hold when it drifts | Monitor separately by market regime |
 | Apple Card (bias and governance) | “The model decided” is not an acceptable answer to an affected client or regulator | We rank internal support work; we do not decide credit | Every severity step shows its reason and is logged | Test fairness across client size and language before launch |
 | iMerit (data operations and labeling) | Model quality is capped by label quality | Our labellers are scarce SMEs, not a large workforce | Double labelling with adjudication (Section 5.3) | Label a small, well-chosen sample instead of everything |
@@ -173,7 +173,7 @@ The full PRD, roadmap, metrics and risk documents are in the Appendix. This sect
 |---|---|---|---|
 | 0. Fix and re-test (Nov to Dec 2026) | Can we close the understated-report gap? Does the design save time? | None | Gate 1 |
 | 1. Shadow (Jan to Feb 2027) | Does it work on real tickets, for all client groups? | L0 | Gate 2 |
-| 2. Suggest and assist (Mar to May 2027) | Do engineers use it well? Is net payoff positive? | L1, then L2 | Gate 3 |
+| 2. Suggest and assist (Mar to May 2027) | Do engineers use it well? Is net effort saved positive? | L1, then L2 | Gate 3 |
 | 3. Second category (Jun to Aug 2027) | Is the design reusable? Should anything be automated? | L0 for new; L3 reviewed | Reuse decision |
 
 ### 3.5 Success Metrics & KPIs Framework
@@ -186,7 +186,7 @@ The full PRD, roadmap, metrics and risk documents are in the Appendix. This sect
 | Model | Calibration error (ECE) | 0.083 | Below 0.05 before L2 | Leading |
 | Product | Time to first correct triage | 10 to 20 min (assumed) | Under 3 minutes | Leading |
 | Product | True cause in top 3 | 96.8% (synthetic) | At least 70% | Leading |
-| Business | Net payoff per issue against current practice | +196 USD (assumed payoffs) | Positive before any level change | Lagging |
+| Business | Net effort saved per issue against current practice | +3.0 h (assumed effort values) | Positive before any level change | Lagging |
 | Business | SLA breaches on S1/S2 issues | Not tracked | Falling | Lagging |
 | Trust | Critical issues under-triaged | 3 of 41 | Near zero | Guardrail |
 | Trust | Override rate and median review time | Not measured | Stable; falling review time with steady errors means rubber-stamping | Guardrail |
@@ -202,9 +202,9 @@ The full PRD, roadmap, metrics and risk documents are in the Appendix. This sect
 | User story | Includes uncertainty and error cost: “When the system is unsure, I see why and it asks an SME to check.” |
 | PRD | Adds data assumptions, confidence behaviour, fallback logic and a list of actions never allowed. |
 | Roadmap | Organised around proof gates with stop conditions, not feature delivery dates. |
-| Metrics | Links model measures (recall, calibration) to dollars through the payoff matrix. |
+| Metrics | Links model measures (recall, calibration) to hours of staff effort through the outcome table. |
 | Launch checklist | Adds review, rollback of autonomy, and escalation (Appendix/Risk_Note). |
-| Pricing note | Includes inference and review cost per issue (Section 6). |
+| Effort note | Includes review effort, running effort and the effort of false escalations per issue (Section 6). |
 | Review memo | Separates measured results from assumptions (Section 10.2). |
 
 **How AI helped create these artifacts, and what stayed with me.** The packet asks for both to be visible.
@@ -215,7 +215,7 @@ The full PRD, roadmap, metrics and risk documents are in the Appendix. This sect
 | Prioritization alternatives | Computed RICE scores on stated assumptions | The priority order follows my proposal: controls and triage first, automation only after the gates |
 | Wireframe starting points | Produced the first console layout | Judged it too crowded and set the two-lane, three-step design |
 | Prototype coding | Wrote the code, synthetic data and test harness | The roles (SME, development team), editable replies and plain wording |
-| Scenario analysis | Calculated the conservative, base and optimistic cases | The payoff values from my proposal, and the recommendation after reviewing the results |
+| Scenario analysis | Calculated the conservative, base and optimistic cases | The outcome values from my proposal, restated as hours of effort, and the recommendation after reviewing the results |
 
 ## 4. UX, Workflow & Trust Design
 
@@ -254,7 +254,7 @@ The system should feel like a careful colleague who shows their working, not lik
 | Issues board | Who must act next? | Three counts; lanes “With your team” and “With the client”; Try your own message; Closed today |
 | Issue page | Decide on one issue | Step 1 Choose the team; Step 2 Find the cause; Step 3 Reply to the client; side card “About this issue” with “Why this priority?” and history |
 | Rules | Set automation per category | Level per category; execution failures locked at L1; paper reuse test |
-| Results | Show the evidence | Evaluation results, where it went wrong, money view by approach |
+| Results | Show the evidence | Evaluation results, where it went wrong, time and effort view by approach |
 
 Low-fidelity wireframes with design notes are in Appendix/Wireframes. The screens below come from the working prototype, simplified after the first version proved too crowded.
 
@@ -375,14 +375,14 @@ Settings were tuned on a 20-report development set, then frozen. The 70-report h
 | Trust | Under-triaged critical issues | 3 (1 fell below escalation) | Near zero | **Target not met** |
 | Trust | Wrong category sent to SME check | 5 of 7 | All | Two errors passed at high confidence |
 | Trust | Guardrail invariants | 5 of 5 held | All, on every ticket | Severity never lowered; no unapproved or uncited send |
-| Business | Net payoff per issue, 5% critical | +196 USD | Model alone −200 | Assumed payoffs, measured error rates |
+| Business | Net effort saved per issue, 5% critical | +3.0 h | Model alone −3.3 h | Assumed effort values, measured error rates |
 | Business | Time to first correct triage | Not measured | Under 3 minutes | Needs real users; no value claimed |
 
-![Figure 5. The control layer raises critical-issue escalation and turns a losing payoff into a positive one.](Appendix/Figures/eval_chart.png)
+![Figure 5. The control layer raises critical-issue escalation and turns lost effort into saved effort.](Appendix/Figures/eval_chart.png)
 
-*Figure 5. The control layer raises critical-issue escalation and turns a losing payoff into a positive one.*
+*Figure 5. The control layer raises critical-issue escalation and turns lost effort into saved effort.*
 
-**What the comparison shows.** At the assumed payoffs, the model alone loses money because each extra miss is so expensive: it missed seven critical issues where TradeSentinel missed one. Escalating everything is a surprisingly strong competitor when critical issues are common (+365 against +378 USD at a 10% share), but far worse when they are rare (−98 against +50 at 1%). The real critical share is therefore a number the pilot must measure.
+**What the comparison shows.** At the assumed effort values, the model alone loses time because each extra miss is so costly: it missed seven critical issues where TradeSentinel missed one. Escalating everything is a surprisingly strong competitor when critical issues are common (+5.8 h against +5.9 h per issue at a 10% share), but far worse when they are rare (−1.7 h against +0.7 h at 1%). The real critical share is therefore a number the pilot must measure.
 
 **Where it failed.**
 
@@ -402,67 +402,67 @@ Very short messages can also score high confidence on little evidence: “Gettin
 |---|---|---|
 | Gate 1: Synthetic | Targets met on synthetic data: root cause at least 70%; under-triage near zero; time under 3 minutes in a user trial | **Partly met.** Root cause met. Under-triage not met. Time not yet measured. |
 | Gate 2: Shadow | 8 weeks on real tickets: category agreement within 5 points of expert-to-expert agreement; no S1 issue called below S2; no critical issue below the escalation line, including replayed past incidents | Not started |
-| Gate 3: Live assist | Positive net payoff against current practice; calibration error below 0.05; stable review time and override rate; SME share within the agreed ceiling; operations and risk sign-off | Not started |
+| Gate 3: Live assist | Positive net effort saved against current practice; calibration error below 0.05; stable review time and override rate; SME share within the agreed ceiling; operations and risk sign-off | Not started |
 
 **Sample size matters.** Zero misses in n cases only shows a true miss rate below about 3/n, so about 300 critical cases are needed to claim under 1%. Live shadow volume alone will not provide that in eight weeks, so Gate 2 also replays historical critical incidents.
 
 ## 6. Business, Economics & Scaling
 
-All amounts here are illustrative assumptions, set out so that they can be challenged and replaced with real figures during the pilot.
+All values here are measured in hours of staff effort, not money. They are illustrative assumptions, set out so that they can be challenged and replaced with real figures during the pilot.
 
 ### 6.1 Monetization Model and Value Logic
 
-**Internal now, SaaS later.** For the pilot, TradeSentinel is funded internally as an operating and risk investment. If the reuse test passes in practice (Phase 3), the control layer and evaluation tooling could be offered to other brokers’ support desks as a subscription, priced per desk. Selling it is not part of this request: our control logic depends on one firm’s SLAs, so an external offer needs proven reuse, configuration that other firms can set themselves, and its own business case.
+**Internal now, SaaS later.** For the pilot, TradeSentinel is justified internally by the staff effort it saves and the incident effort it avoids. If the reuse test passes in practice (Phase 3), the control layer and evaluation tooling could be offered to other brokers’ support desks as a subscription service. That is not part of this request: our control logic depends on one firm’s SLAs, so an external offer needs proven reuse, configuration that other firms can set themselves, and its own business case.
 
 - **Time:** faster triage and resolution, and fewer duplicate tickets worked separately.
-- **Risk:** fewer critical issues missed or under-called, the largest and least certain value.
+- **Avoided incident effort:** fewer critical issues missed or under-called, the largest and least certain value.
 - **Consistency:** quality depends less on who is on shift.
 
 ### 6.2 The Economics of Being Wrong
 
-Escalating is the better decision whenever the chance that an issue is critical exceeds the break-even share below. The conclusion survives large changes in the inputs: the break-even stays low, so the design should continue to lean towards escalation. That has a limit: the share of issues sent to SMEs must stay within a ceiling agreed with the SME team, because an overloaded SME stops checking carefully. If the ceiling is breached, the confidence threshold is reviewed with evidence; severity floors are never lowered to relieve load.
+Each outcome is valued in hours of staff effort (assumed): a critical issue escalated in time saves about 80 hours of incident work; a missed one costs about 800 hours of investigation, client remediation, reconciliations and reporting, before any harm to the client, which is not counted; a needless escalation costs about 2.5 hours of SME time; and a minor issue handled normally saves about half an hour. Escalating is the better decision whenever the chance that an issue is critical exceeds the break-even share below. The conclusion survives large changes in the inputs: the break-even stays low, so the design should continue to lean towards escalation. That has a limit: the share of issues sent to SMEs must stay within a ceiling agreed with the SME team, because an overloaded SME stops checking carefully. If the ceiling is breached, the confidence threshold is reviewed with evidence; severity floors are never lowered to relieve load.
 
-| Scenario | False escalation (USD) | Missed critical (USD) | Break-even critical share |
+| Scenario | Needless escalation (hours) | Missed critical (hours) | Break-even critical share |
 |---|---|---|---|
-| Proposal values | 150 | 50,000 | 0.34% |
-| False escalation costs USD 500 | 500 | 50,000 | 0.97% |
-| A miss costs USD 10,000 | 150 | 10,000 | 1.25% |
-| Both of the above | 500 | 10,000 | 3.47% |
+| Base values | 2.5 | 800 | 0.34% |
+| A needless escalation takes 8 hours | 8 | 800 | 0.96% |
+| A miss costs 160 hours | 2.5 | 160 | 1.23% |
+| Both of the above | 8 | 160 | 3.42% |
 
-*Correction to the proposal.* The proposal described a false escalation as wasting “a few minutes” but priced it at USD 150. That figure only makes sense if it includes interrupting an SME and possibly opening a bridge. We keep USD 150 as the more cautious value, because it works against our own case, and test USD 500 above.
+*Change from the proposal.* The proposal priced each outcome in money and described a needless escalation as wasting “a few minutes”. This report measures outcomes in hours of staff effort instead, keeping the proposal’s proportions, so the break-even is unchanged. A needless escalation is set at 2.5 hours, because it interrupts an SME and may open a bridge call; that is more cautious than “a few minutes” and works against our own case, and 8 hours is tested above.
 
-### 6.3 Cost Drivers
+### 6.3 Effort Drivers
 
 | Driver | Assumption | Per issue or per month |
 |---|---|---|
-| Model / API | 11,000 input and 1,100 output tokens per issue, at an assumed USD 3 and USD 15 per million | About USD 0.05 per issue (USD 0.10 with retries) |
+| Model / API | About 12,000 tokens read and written per issue, answered in seconds | No staff effort; computing cost negligible |
 | Review | Engineer still reviews every decision; netted against time saved | Included in time saved |
-| False escalations | 13.8% of minor issues (measured, synthetic), 95% of issues minor, USD 150 each, less the human baseline rate (unknown; 0% to 10% assumed) | USD 5.42 to USD 19.67 per issue |
-| Run and maintain | 0.5 FTE for evaluation, prompts and config, plus hosting and logging | USD 7,000 per month |
-| Pilot build | Two engineers for three months at an assumed USD 60 per hour | About USD 60,000 once |
+| False escalations | 13.8% of minor issues (measured, synthetic), 95% of issues minor, 2.5 hours of SME time each, less the human baseline rate (unknown; 0% to 10% assumed) | 5.4 min to 19.7 min per issue |
+| Run and maintain | 0.5 FTE for evaluation, prompts and configuration | About 80 hours a month |
+| Pilot build | Two engineers for three months | About 1,000 hours once |
 
 ### 6.4 Unit Economics
 
-| Per issue, at 1,000 issues a month | Conservative | Base | Optimistic |
+| Minutes per issue, at 1,000 issues a month | Conservative | Base | Optimistic |
 |---|---|---|---|
-| Time saved (at assumed USD 60 per hour) | USD 7 | USD 30 | USD 40 |
-| Inference | −USD 0.10 | −USD 0.05 | −USD 0.05 |
-| Extra false escalations | −USD 19.67 | −USD 12.54 | −USD 5.42 |
-| Run and maintain | −USD 7.00 | −USD 7.00 | −USD 7.00 |
-| **Net per issue, before avoided misses** | **−USD 19.77** | **USD 10.41** | **USD 27.54** |
-| Net per month | −USD 19,765 | USD 10,410 | USD 27,535 |
-| Payback on pilot build | None from time alone | 5.8 months | 2.2 months |
+| Triage time saved | 7 min | 30 min | 40 min |
+| Model running | Negligible | Negligible | Negligible |
+| Extra false escalations | −19.7 min | −12.5 min | −5.4 min |
+| Run and maintain | −4.8 min | −4.8 min | −4.8 min |
+| **Net per issue, before avoided misses** | **−17.5 min** | **12.7 min** | **29.8 min** |
+| Net per month | −291 hours | 211 hours | 496 hours |
+| Build effort repaid in | Not from time alone | 4.7 months | 2.0 months |
 
-**What this means.** Inference is a rounding error. False escalations are not: they can consume more than the time saved. Time savings alone may therefore not justify the product. In the conservative case the shortfall is USD 19,765 a month, which one avoided critical miss about every 2.8 months would cover (a miss turned into a catch is worth USD 55,000 at the assumed payoffs). The case therefore rests on risk reduction, which is why that is what the pilot must measure.
+**What this means.** Running the model takes no staff effort. False escalations do: they can consume more time than triage saves. Time savings alone may therefore not justify the product. In the conservative case the shortfall is about 291 hours a month, which one avoided critical miss about every 3.0 months would cover (a miss turned into a catch is worth about 880 hours at the assumed values). The case therefore rests on avoided incidents, which is why that is what the pilot must measure.
 
-**Volume matters.** In the base case, contribution before fixed cost is USD 17.41 per issue, so break-even is about 403 issues a month: at 300 a month the result is −USD 5.92 per issue; at 3,000 it is USD 15.08. A very small desk may be better served by runbooks and rules.
+**Volume matters.** In the base case, the saving before running effort is 17.5 min per issue, so break-even is about 275 issues a month: at 300 a month the result is 1.5 min per issue; at 3,000 it is 15.9 min. A very small desk may be better served by runbooks and rules.
 
 ### 6.5 Scaling Risks and Operational Implications
 
 | Risk | What happens | Response |
 |---|---|---|
 | Latency | Peak load coincides with market stress, exactly when API latency and rate limits may bite | Rules run locally and first; a queue with a time limit falls back to the manual path |
-| Cost growth | Alert storms multiply inference calls | Cluster before calling the model; per-incident budgets |
+| Compute growth | Alert storms multiply model calls | Cluster before calling the model; per-incident limits |
 | Workflow complexity | Every category adds floors, owners and runbooks | Add a category only with a named owner; retire unused rules |
 | Governance burden | Each level change needs evidence and sign-off | Automated gate reports; quarterly review |
 | Team effects | Juniors may lose triage skill; SMEs may get more escalations | Rotate triage without AI; watch SME load as a guardrail |
@@ -484,7 +484,7 @@ The full risk register and launch checklist are in Appendix/Risk_Note.
 
 ### 7.2 Harm Scenarios
 
-- **Client:** an understated execution failure waits in a queue while the client’s position loses money.
+- **Client:** an understated execution failure waits in a queue while the market moves against the client’s position.
 - **Many clients:** a wrong cause in an update leads clients to make trading decisions on false information.
 - **Engineer:** blame falls on the person who clicked approve for a system error they could not reasonably have seen.
 - **Firm:** a reportable event is under-classified or not recorded, and audit cannot reconstruct why.
@@ -542,13 +542,13 @@ The proposal set a hard test: can a machine-generated, high-volume, many-client 
 
 ## 9. AI Collaboration Summary
 
-I worked as the product manager and used Claude Code (Claude Opus 5.5) as a coding and drafting assistant. The product thinking comes from my October proposal: the problem, the wedge, the trust ladder, the guardrails, the payoff matrix and the decision gates. I then gave the assistant specific briefs: build the full package and a working prototype from my proposal; simplify the console into two lanes when the first version was too crowded; use the SME role and send fixes to the development team, as a real support desk works; make client replies editable; use plainer language; and organise the documentation by the packet’s sections. The assistant wrote the code, the synthetic data and first drafts; I reviewed each round in a demo and asked for changes. The decisions the packet reserves for people stayed with me. The full account is in 05_AI_Collaboration_Log.md.
+I worked as the product manager and used Claude Code (Claude Opus 5.5) as a coding and drafting assistant. The product thinking comes from my October proposal: the problem, the wedge, the trust ladder, the guardrails, the cost of being wrong and the decision gates. I then gave the assistant specific briefs: build the full package and a working prototype from my proposal; simplify the console into two lanes when the first version was too crowded; use the SME role and send fixes to the development team, as a real support desk works; make client replies editable; use plainer language; organise the documentation by the packet’s sections; and measure outcomes in hours of staff effort rather than money. The assistant wrote the code, the synthetic data and first drafts; I reviewed each round in a demo and asked for changes. The decisions the packet reserves for people stayed with me. The full account is in 05_AI_Collaboration_Log.md.
 
 ## 10. Recommendation
 
 ### 10.1 Decision Requested
 
-**Pilot, in shadow mode only. Do not scale.** Approve Phase 0 and Phase 1 for one flow, with an assumed build budget of about USD 60,000. Autonomy stays at L0 until Gate 2 is passed.
+**Pilot, in shadow mode only. Do not scale.** Approve Phase 0 and Phase 1 for one flow, with an assumed build effort of about 1,000 hours (two engineers for three months). Autonomy stays at L0 until Gate 2 is passed.
 
 1. **Phase 0 (before any live data):** fix the understated-report weakness, re-test on a new held-out set written by someone else, and run a five-engineer timed trial for the missing triage measure.
 2. **Phase 1 (eight weeks):** silent shadow mode on real tickets with masked data; expert labels; replay of historic critical incidents; measure the real critical share and the human baseline.
@@ -560,4 +560,4 @@ I worked as the product manager and used Claude Code (Claude Opus 5.5) as a codi
 
 | Measured in this project | Assumed, to be tested in the pilot | Unknown today |
 |---|---|---|
-| Classifier and control results on synthetic reports; guardrail behaviour in code; break-even arithmetic; paper reuse test | Triage times; payoff values; volumes; token costs and prices; engineer hourly cost; fixed costs; pilot dates; personas and data readiness | Real-ticket accuracy; real critical share; human baseline miss and escalation rates; engineer trust; regulator view |
+| Classifier and control results on synthetic reports; guardrail behaviour in code; break-even arithmetic; paper reuse test | Triage times; effort values per outcome; volumes; build and running effort; pilot dates; personas and data readiness | Real-ticket accuracy; real critical share; human baseline miss and escalation rates; engineer trust; regulator view |

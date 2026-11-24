@@ -54,12 +54,15 @@ const crit = test.filter(t => RANK[t.sev] >= RANK.S2), sev1 = test.filter(t => t
 const under = (list, f) => list.filter(t => RANK[f(t)] < RANK[t.sev]);
 const esc = s => RANK[s] >= RANK.S2;
 const strategies = { 'TradeSentinel (floors + blast radius)': t => t.finalSev, 'Model alone, no control layer': t => t.triage.modelSeverity, 'Keyword rules baseline': t => t.kw.severity, 'Escalate everything': () => 'S1', 'Escalate nothing': () => 'S4' };
-const PAY = { tp: 5000, fn: -50000, fp: -150, tn: 40 };
+// Value of each outcome in hours of staff effort (assumed): a critical issue escalated in time saves about 80 hours of incident
+// work; a missed one costs about 800 (investigation, client remediation, reconciliations, reporting); a needless escalation
+// costs about 2.5 hours of SME time; a minor issue handled normally saves about half an hour.
+const PAY = { tp: 80, fn: -800, fp: -2.5, tn: 0.5 };
 const prevalence = [0.01, 0.05, 0.10];
 const sevTable = Object.entries(strategies).map(([name, f]) => {
   const recall = crit.filter(t => esc(f(t))).length / crit.length, fpr = minor.filter(t => esc(f(t))).length / minor.length;
-  const ev = p => Math.round(p * (recall * PAY.tp + (1 - recall) * PAY.fn) + (1 - p) * (fpr * PAY.fp + (1 - fpr) * PAY.tn));
-  return { name, criticalRecall: +(100 * recall).toFixed(1), missed: crit.filter(t => !esc(f(t))).map(t => t.id), falseEscalationRate: +(100 * fpr).toFixed(1), netPayoffPerIssue: Object.fromEntries(prevalence.map(p => [p, ev(p)])) };
+  const ev = p => Math.round(10 * (p * (recall * PAY.tp + (1 - recall) * PAY.fn) + (1 - p) * (fpr * PAY.fp + (1 - fpr) * PAY.tn))) / 10;
+  return { name, criticalRecall: +(100 * recall).toFixed(1), missed: crit.filter(t => !esc(f(t))).map(t => t.id), falseEscalationRate: +(100 * fpr).toFixed(1), netHoursPerIssue: Object.fromEntries(prevalence.map(p => [p, ev(p)])) };
 });
 
 // Pairwise clustering quality.

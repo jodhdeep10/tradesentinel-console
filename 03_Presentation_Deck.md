@@ -15,7 +15,7 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 ## Slide 2: Recommendation: pilot in shadow mode only, and do not scale yet
 
 - Why go ahead
-- The decision repeats on every ticket and its cost is measurable
+- The decision repeats on every ticket and its effort is measurable
 - AI read reports far better than rules: 90% against 45.7%
 - With controls, 97.6% of critical issues were escalated
 - Why not more than a pilot
@@ -23,7 +23,7 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - Time saved has not been measured
 - All data so far is synthetic
 - The ask
-- About USD 60,000 build (assumed)
+- About 1,000 hours of build effort (assumed)
 - Fix and re-test, then 8 weeks in silent shadow
 - One flow, one client tier, one venue
 - Stop conditions agreed in advance
@@ -37,19 +37,19 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - The queue grows fastest in volatile markets
 - One fault gets opened many times and worked separately
 - Quality depends on who is on shift
-- USD per incident (assumed)
+- Hours of effort per issue (assumed)
 - Escalate
 - Do not escalate
 - Genuinely critical
-- +5,000
-- −50,000
+- +80
+- −800
 - Actually minor
-- −150
-- +40
+- −2.5
+- +0.5
 - About 0.3%
 - chance of being critical is enough to justify escalating. Even with far less extreme inputs, break-even stays under 3.5%.
 
-> **Speaker notes:** The problem and the stakes. These values are the assumed ones from the proposal. The point is the ratio, about 333 false escalations to one miss. And note the correction: the proposal said a false escalation wastes a few minutes but priced it at 150 dollars. We kept the higher figure since it works against our case.
+> **Speaker notes:** The problem and the stakes, in hours of staff effort. These values are assumptions, in the same proportions as the proposal. The point is the ratio: one miss takes as much effort as about 320 needless escalations. A needless escalation is set at 2.5 hours of SME time, more cautious than the proposal’s “a few minutes”, since it works against our case.
 
 ## Slide 4: The user is a support engineer deciding under pressure, and rules alone cannot read client language
 
@@ -137,7 +137,7 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - guardrail checks held on every ticket
 - Synthetic data; one author wrote the data and the tests, so results are likely optimistic. 95% interval on critical escalation: 87.4% to 99.6%.
 
-> **Speaker notes:** Seventy held-out synthetic reports, run once on frozen settings. Accuracy looks similar with or without controls, since the controls do not change the category. What changes is the decision, and that turns a loss into a gain at the assumed payoffs. Be honest about limits: one author wrote data and tests.
+> **Speaker notes:** Seventy held-out synthetic reports, run once on frozen settings. Accuracy looks similar with or without controls, since the controls do not change the category. What changes is the decision, and that turns lost effort into saved effort at the assumed values. Be honest about limits: one author wrote data and tests.
 
 ## Slide 9: It failed where we most feared: “Not urgent, but…”
 
@@ -163,42 +163,42 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 
 > **Speaker notes:** This is the most important slide. A polite report about a real failure got a wrong category at 82 percent confidence, so no floor or SME check fired. Confidence alone is not a safety signal. The fix is proposed but untested, and it needs a new test set as this one has now been seen.
 
-## Slide 10: Inference is cheap; false escalations are not, so the case rests on avoided misses
+## Slide 10: Running the model costs no staff time; false escalations do, so the case rests on avoided misses
 
-- Per issue, 1,000 issues a month
+- Minutes per issue, 1,000 issues a month
 - Conservative
 - Base
 - Optimistic
-- Time saved
-- USD 7
-- USD 30
-- USD 40
-- Inference
-- −USD 0.10
-- −USD 0.05
-- −USD 0.05
+- Triage time saved
+- 7 min
+- 30 min
+- 40 min
+- Model running
+- None
+- None
+- None
 - Extra false escalations
-- −USD 19.67
-- −USD 12.54
-- −USD 5.42
+- −19.7 min
+- −12.5 min
+- −5.4 min
 - Run and maintain
-- −USD 7.00
-- −USD 7.00
-- −USD 7.00
+- −4.8 min
+- −4.8 min
+- −4.8 min
 - Net per issue
-- −USD 19.77
-- USD 10.41
-- USD 27.54
-- Payback on build
-- None from time alone
-- 5.8 months
-- 2.2 months
+- −17.5 min
+- 12.7 min
+- 29.8 min
+- Build effort repaid in
+- Not from time alone
+- 4.7 months
+- 2.0 months
 - 1 miss
-- avoided about every 2.8 months covers the conservative shortfall of USD 19,765 a month
-- Break-even at about 403 issues a month in the base case. A very small desk may not need this.
-- Funded internally for the pilot; a SaaS offer to other brokers only if reuse is proven. All amounts are illustrative assumptions.
+- avoided about every 3.0 months covers the conservative shortfall of about 291 hours a month
+- Break-even at about 275 issues a month in the base case. A very small desk may not need this.
+- Justified internally by effort saved; a SaaS offer to other brokers only if reuse is proven. All values are assumed hours of staff effort.
 
-> **Speaker notes:** Honest economics. Inference is about five cents. False escalations eat most of the time savings. In the conservative case the product loses money on time alone, but a single avoided miss every few months covers the gap. So risk reduction is the claim that the pilot has to test. All values are assumptions.
+> **Speaker notes:** Honest time and effort view, in minutes per issue. Running the model takes no staff time. False escalations take SME time and eat most of the triage savings. In the conservative case the product loses time on triage alone, but a single avoided miss every few months covers the gap. So avoided incidents are the claim that the pilot has to test. All values are assumptions.
 
 ## Slide 11: Specific risks have specific controls, and six things block launch
 
@@ -237,7 +237,7 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - Gate 2
 - Real tickets match experts; no S1 called below S2; fairness and masking verified
 - Gate 3
-- Positive net payoff; ECE below 0.05; operations and risk sign-off
+- Positive net effort saved; ECE below 0.05; operations and risk sign-off
 
 > **Speaker notes:** A failed gate moves everything to its right, so dates are illustrative. In Phase 1, zero misses in n cases only supports a rate below about 3 in n, so we also replay historic critical incidents. About 300 critical cases are needed to claim under one percent.
 
@@ -246,7 +246,7 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - We recommend
 - Pilot in shadow mode only; do not scale
 - One flow, one client tier, one venue
-- About USD 60,000 build (assumed)
+- About 1,000 hours of build effort (assumed)
 - Phase 0 fixes the understated-report gap
 - 8 weeks silent on masked real tickets
 - Gate 2 decides: L1, stay in shadow, or stop
@@ -256,4 +256,4 @@ Text and speaker notes of each slide. The designed slides are in 03_Presentation
 - Client data cannot be protected
 - A useful but unsafe system stays an assist feature
 
-> **Speaker notes:** Close decisively. Say the recommendation again, the budget, and the stop conditions. Then invite challenge. If asked what AI did in this work, refer to the AI collaboration log and be ready to explain what you changed yourself.
+> **Speaker notes:** Close decisively. Say the recommendation again, the build effort, and the stop conditions. Then invite challenge. If asked what AI did in this work, refer to the AI collaboration log and be ready to explain what you changed yourself.

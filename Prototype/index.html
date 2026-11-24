@@ -427,10 +427,10 @@ const RAW={"train":"order_rejected|S3|My limit order was rejected as soon as I s
           "H68"
         ],
         "falseEscalationRate": 13.8,
-        "netPayoffPerIssue": {
-          "0.01": 50,
-          "0.05": 196,
-          "0.1": 378
+        "netHoursPerIssue": {
+          "0.01": 0.7,
+          "0.05": 3,
+          "0.1": 5.9
         }
       },
       {
@@ -446,10 +446,10 @@ const RAW={"train":"order_rejected|S3|My limit order was rejected as soon as I s
           "H69"
         ],
         "falseEscalationRate": 10.3,
-        "netPayoffPerIssue": {
-          "0.01": -24,
-          "0.05": -200,
-          "0.1": -421
+        "netHoursPerIssue": {
+          "0.01": -0.5,
+          "0.05": -3.3,
+          "0.1": -6.9
         }
       },
       {
@@ -481,10 +481,10 @@ const RAW={"train":"order_rejected|S3|My limit order was rejected as soon as I s
           "H69"
         ],
         "falseEscalationRate": 10.3,
-        "netPayoffPerIssue": {
-          "0.01": -238,
-          "0.05": -1273,
-          "0.1": -2567
+        "netHoursPerIssue": {
+          "0.01": -3.9,
+          "0.05": -20.5,
+          "0.1": -41.2
         }
       },
       {
@@ -492,10 +492,10 @@ const RAW={"train":"order_rejected|S3|My limit order was rejected as soon as I s
         "criticalRecall": 100,
         "missed": [],
         "falseEscalationRate": 100,
-        "netPayoffPerIssue": {
-          "0.01": -98,
-          "0.05": 108,
-          "0.1": 365
+        "netHoursPerIssue": {
+          "0.01": -1.7,
+          "0.05": 1.6,
+          "0.1": 5.8
         }
       },
       {
@@ -545,10 +545,10 @@ const RAW={"train":"order_rejected|S3|My limit order was rejected as soon as I s
           "H69"
         ],
         "falseEscalationRate": 0,
-        "netPayoffPerIssue": {
-          "0.01": -460,
-          "0.05": -2462,
-          "0.1": -4964
+        "netHoursPerIssue": {
+          "0.01": -7.5,
+          "0.05": -39.5,
+          "0.1": -79.5
         }
       }
     ],
@@ -796,7 +796,7 @@ function results(){
   <div class="tiles"><div class="tile"><b>${R.category.accuracy}%</b><span>understood correctly (simple keyword rules: ${R.category.baselineAccuracy}%)</span></div><div class="tile"><b>${tr[0].criticalRecall}%</b><span>of serious issues raised in time (AI without the rules: ${tr[1].criticalRecall}%)</span></div><div class="tile"><b>${R.rootCause.top3}%</b><span>had the real cause in its top three</span></div><div class="tile"><b>${R.severity.underS1S2.length}</b><span>serious issues given too low a priority</span></div></div>
   <section class="card"><h3>Where it went wrong</h3><div class="tw"><table><thead><tr><th>Message</th><th>Should be</th><th>Got</th></tr></thead><tbody>${R.severity.underS1S2.map(u=>`<tr><td>${esc(u.text)}</td><td>${pill(u.truth)}</td><td>${pill(u.got)}</td></tr>`).join('')}</tbody></table></div>
   <p class="small">Polite, low-key messages are the weak spot. The same person wrote the test messages and the system, so real results will probably be lower.</p></section>
-  <details class="extra"><summary>Money view by approach</summary><div class="tw" style="margin-top:10px"><table><thead><tr><th>Approach</th><th>Serious issues raised</th><th>USD gained or lost per issue</th></tr></thead><tbody>${tr.map(x=>`<tr><td>${esc(x.name)}</td><td>${x.criticalRecall}%</td><td>${x.netPayoffPerIssue['0.05']}</td></tr>`).join('')}</tbody></table></div><p class="hint" style="margin-top:8px">Uses assumed costs from the proposal, and assumes 5% of issues are serious.</p></details></div>`;
+  <details class="extra"><summary>Time and effort view by approach</summary><div class="tw" style="margin-top:10px"><table><thead><tr><th>Approach</th><th>Serious issues raised</th><th>Hours of effort saved or lost per issue</th></tr></thead><tbody>${tr.map(x=>{const v=x.netHoursPerIssue['0.05'];return `<tr><td>${esc(x.name)}</td><td>${x.criticalRecall}%</td><td>${(v<0?'−':'+')+Math.abs(v).toFixed(1)} h</td></tr>`}).join('')}</tbody></table></div><p class="hint" style="margin-top:8px">Uses assumed hours of staff effort for each outcome (a missed serious issue about 800 hours, a needless escalation about 2.5 hours), and assumes 5% of issues are serious.</p></details></div>`;
 }
 function render(){nav();document.getElementById('view').innerHTML=S.sel?detail():S.tab==='rules'?rules():S.tab==='results'?results():home();}
 function refresh(){recompute();render()}
