@@ -94,6 +94,10 @@ RICE ranks the options, but the control layer sits above it: it is a preconditio
 
 **Platform vs feature.** TradeSentinel starts as a feature inside existing support tooling. It becomes a platform only if new categories can be added as configuration. The reuse test in Section 8.2 addresses this directly; if it fails in practice, the product stays an assist feature, as the proposal committed.
 
+![Figure 1. What is bought and what is built. Client data is masked inside the firm before any call to the language model, and the control layer sits outside the model.](Appendix/Figures/architecture.png)
+
+*Figure 1. What is bought and what is built. Client data is masked inside the firm before any call to the language model, and the control layer sits outside the model.*
+
 ### 2.6 First Wedge Selection & Course Case Lens Comparative Analysis
 
 **Chosen wedge:** order-entry and execution issues for one client tier on one venue. Choosing the riskiest flow first is deliberate: if the controls hold here, they are likely to hold in easier flows; the reverse is not true.
@@ -165,9 +169,9 @@ The full PRD, roadmap, metrics and risk documents are in the Appendix. This sect
 
 **Trust ladder.** L0 Shadow (runs silently), L1 Suggest (shows suggestions; person decides), L2 Assisted (pre-fills for one-click approval), L3 Limited auto (low-risk, reversible actions only). Levels are set per category and must be earned.
 
-![Figure 1. Each phase is entered only by passing a gate. Full gate criteria are in Appendix/Roadmap.](Appendix/Figures/roadmap.png)
+![Figure 2. Each phase is entered only by passing a gate. Full gate criteria are in Appendix/Roadmap.](Appendix/Figures/roadmap.png)
 
-*Figure 1. Each phase is entered only by passing a gate. Full gate criteria are in Appendix/Roadmap.*
+*Figure 2. Each phase is entered only by passing a gate. Full gate criteria are in Appendix/Roadmap.*
 
 | Phase | Question it answers | Autonomy | Gate to leave |
 |---|---|---|---|
@@ -230,9 +234,19 @@ The system should feel like a careful colleague who shows their working, not lik
 
 ### 4.2 End-to-End User Journey & Workflow Comparison (As-Is vs. To-Be)
 
-![Figure 2. The AI reads and matches, rules set the limits, and a person makes every decision that matters.](Appendix/Figures/workflow.png)
+![Figure 3. The AI reads and matches, rules set the limits, and a person makes every decision that matters.](Appendix/Figures/workflow.png)
 
-*Figure 2. The AI reads and matches, rules set the limits, and a person makes every decision that matters.*
+*Figure 3. The AI reads and matches, rules set the limits, and a person makes every decision that matters.*
+
+The two swimlane diagrams below show who does what, step by step, today and with TradeSentinel. Each lane is one role; the numbered red boxes are today’s pain points.
+
+![Figure 4. As-is: one engineer reads, sizes, routes, investigates and writes every update by hand, and experts are pulled in without evidence.](Appendix/Figures/swim_asis.png)
+
+*Figure 4. As-is: one engineer reads, sizes, routes, investigates and writes every update by hand, and experts are pulled in without evidence.*
+
+![Figure 5. To-be: the AI reads and drafts, fixed rules set the minimum priority and decide when an SME checks, and people make every decision that matters.](Appendix/Figures/swim_tobe.png)
+
+*Figure 5. To-be: the AI reads and drafts, fixed rules set the minimum priority and decide when an SME checks, and people make every decision that matters.*
 
 | Step | As-is (today) | To-be (with TradeSentinel) |
 |---|---|---|
@@ -256,17 +270,21 @@ The system should feel like a careful colleague who shows their working, not lik
 | Rules | Set automation per category | Level per category; execution failures locked at L1; paper reuse test |
 | Results | Show the evidence | Evaluation results, where it went wrong, time and effort view by approach |
 
+![Figure 6. Issue lifecycle. The two lanes on the home board are the states “With your team” and “With the client”; only a person can merge or close an issue.](Appendix/Figures/lifecycle.png)
+
+*Figure 6. Issue lifecycle. The two lanes on the home board are the states “With your team” and “With the client”; only a person can merge or close an issue.*
+
 Low-fidelity wireframes with design notes are in Appendix/Wireframes. The screens below come from the working prototype, simplified after the first version proved too crowded.
 
 **Home board.** *With your team* holds issues that need support action, most urgent first. *With the client* holds issues where an update has gone out and the client must reply or confirm, each showing what is awaited and since when. Issues that need expert judgment are flagged “SME check”.
 
-![Figure 3. Home board. The four linked stuck-order reports lead the team lane at S1; three issues wait on clients.](Appendix/Screenshots_or_Video/01_dashboard_two_lanes.png)
+![Figure 7. Home board. The four linked stuck-order reports lead the team lane at S1; three issues wait on clients.](Appendix/Screenshots_or_Video/01_dashboard_two_lanes.png)
 
-*Figure 3. Home board. The four linked stuck-order reports lead the team lane at S1; three issues wait on clients.*
+*Figure 7. Home board. The four linked stuck-order reports lead the team lane at S1; three issues wait on clients.*
 
-![Figure 4. “Quick question, nothing major”: one issue, three steps. Low confidence asks an SME to check, and with execution failures held at L1 nothing is pre-filled.](Appendix/Screenshots_or_Video/02_understated_report_sme_check.png)
+![Figure 8. “Quick question, nothing major”: one issue, three steps. Low confidence asks an SME to check, and with execution failures held at L1 nothing is pre-filled.](Appendix/Screenshots_or_Video/02_understated_report_sme_check.png)
 
-*Figure 4. “Quick question, nothing major”: one issue, three steps. Low confidence asks an SME to check, and with execution failures held at L1 nothing is pre-filled.*
+*Figure 8. “Quick question, nothing major”: one issue, three steps. Low confidence asks an SME to check, and with execution failures held at L1 nothing is pre-filled.*
 
 ### 4.4 Trust, Explainability, and Information Hierarchy (Visible vs. Hidden)
 
@@ -378,9 +396,9 @@ Settings were tuned on a 20-report development set, then frozen. The 70-report h
 | Business | Net effort saved per issue, 5% critical | +3.0 h | Model alone −3.3 h | Assumed effort values, measured error rates |
 | Business | Time to first correct triage | Not measured | Under 3 minutes | Needs real users; no value claimed |
 
-![Figure 5. The control layer raises critical-issue escalation and turns lost effort into saved effort.](Appendix/Figures/eval_chart.png)
+![Figure 9. The control layer raises critical-issue escalation and turns lost effort into saved effort.](Appendix/Figures/eval_chart.png)
 
-*Figure 5. The control layer raises critical-issue escalation and turns lost effort into saved effort.*
+*Figure 9. The control layer raises critical-issue escalation and turns lost effort into saved effort.*
 
 **What the comparison shows.** At the assumed effort values, the model alone loses time because each extra miss is so costly: it missed seven critical issues where TradeSentinel missed one. Escalating everything is a surprisingly strong competitor when critical issues are common (+5.8 h against +5.9 h per issue at a 10% share), but far worse when they are rare (−1.7 h against +0.7 h at 1%). The real critical share is therefore a number the pilot must measure.
 
@@ -521,9 +539,9 @@ We would pause or reject launch if any of the following is true:
 | What it does not yet prove | Language model quality; performance on real tickets; time saved; engineer trust; integration; scale; regulatory acceptance. It uses no real data. Send actions are simulated. |
 | Links | Live demo: https://jodhdeep10.github.io/tradesentinel-console/ Repository: https://github.com/jodhdeep10/tradesentinel-console Setup and walkthrough: 04_Prototype_Readme_or_Link.md. Screenshots: Appendix/Screenshots_or_Video. |
 
-![Figure 6. Resolution: each cause cites past incidents and releases, the fix is assigned to the development team, and sending the reply, which the engineer can edit, moves the issue to the client lane.](Appendix/Screenshots_or_Video/04_resolution_and_client_update.png)
+![Figure 10. Resolution: each cause cites past incidents and releases, the fix is assigned to the development team, and sending the reply, which the engineer can edit, moves the issue to the client lane.](Appendix/Screenshots_or_Video/04_resolution_and_client_update.png)
 
-*Figure 6. Resolution: each cause cites past incidents and releases, the fix is assigned to the development team, and sending the reply, which the engineer can edit, moves the issue to the client lane.*
+*Figure 10. Resolution: each cause cites past incidents and releases, the fix is assigned to the development team, and sending the reply, which the engineer can edit, moves the issue to the client lane.*
 
 ### 8.2 Reuse Test - Market Data Feed Delay Alerts
 

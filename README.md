@@ -27,6 +27,7 @@ Each document is provided as a PDF (the formal submission) and as Markdown (for 
 |---|---|---|
 | PRD | [PDF](Appendix/PRD/PRD.pdf) | [Markdown](Appendix/PRD/PRD.md) |
 | Wireframes | [PDF](Appendix/Wireframes/Wireframes.pdf) | [Markdown](Appendix/Wireframes/Wireframes.md) |
+| Diagrams (swimlanes, workflow, lifecycle, architecture) | [PDF](Appendix/Diagrams/Diagrams.pdf) | [Markdown](Appendix/Diagrams/Diagrams.md) |
 | Metrics and Evaluation | [PDF](Appendix/Metrics/Metrics_and_Evaluation.pdf) | [Markdown](Appendix/Metrics/Metrics_and_Evaluation.md) |
 | Roadmap | [PDF](Appendix/Roadmap/Roadmap.pdf) | [Markdown](Appendix/Roadmap/Roadmap.md) |
 | Risk Note | [PDF](Appendix/Risk_Note/Risk_Note.pdf) | [Markdown](Appendix/Risk_Note/Risk_Note.md) |
